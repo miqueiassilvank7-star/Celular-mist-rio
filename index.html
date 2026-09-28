@@ -1,621 +1,294 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>O Celular da Bia</title>
-<style>
-:root{
-  --bg:#12141c;
-  --ink:#f2ede2;
-  --ink-dim:#9a9689;
-  --panel:#1c1f2b;
-  --panel-2:#232637;
-  --accent:#e0a13d;
-  --accent-dim:#8a6a2e;
-  --alert:#c65f4d;
-  --bubble-me:#3a5a52;
-  --bubble-them:#2a2d3d;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
-}
-*{box-sizing:border-box;}
-html{scroll-padding-top:env(safe-area-inset-top,0px);}
-body{
-  margin:0; min-height:100%;
-  background:radial-gradient(ellipse at top, #1a1e2c 0%, #0b0c12 70%);
-  display:flex; align-items:center; justify-content:center;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  color:var(--ink); padding:24px 12px;
-}
-.frame{
-  width:100%; max-width:380px; height:800px;
-  background:#000; border-radius:44px; padding:12px;
-  box-shadow:0 30px 60px rgba(0,0,0,.6), inset 0 0 0 2px #2a2a2a;
-  position:relative;
-}
-.screen{ width:100%; height:100%; background:var(--bg); border-radius:32px; overflow:hidden; position:relative; display:flex; flex-direction:column; }
-.notch{ position:absolute; top:0; left:50%; transform:translateX(-50%); width:120px; height:22px; background:#000; border-radius:0 0 16px 16px; z-index:50; }
-
-.lock{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; padding-top:70px; background:linear-gradient(160deg,#22283d 0%, #12141c 60%); z-index:40; transition:transform .35s ease; }
-.lock.hidden{ transform:translateY(-100%); }
-.lock .time{ font-size:58px; font-weight:600; letter-spacing:-1px; }
-.lock .date{ font-size:15px; color:var(--ink-dim); margin-top:4px; }
-.lock .hint{ margin-top:auto; margin-bottom:34px; font-size:13px; color:var(--ink-dim); text-align:center; padding:0 30px; }
-.lock .swipe-btn{ margin-top:60px; padding:14px 26px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:20px; color:var(--ink); font-size:14px; }
-
-.home{ flex:1; display:flex; flex-direction:column; padding:46px 20px 16px; overflow-y:auto; }
-.home .status{ font-size:12px; color:var(--ink-dim); text-align:center; margin-bottom:4px;}
-.apps{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px 12px; margin-top:18px; }
-.app{ display:flex; flex-direction:column; align-items:center; gap:6px; background:none; border:none; color:var(--ink); font-family:inherit; cursor:pointer; }
-.app .icon{ width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:24px; position:relative; }
-.app .icon.msg{ background:linear-gradient(160deg,#3a5a52,#25392f); }
-.app .icon.gal{ background:linear-gradient(160deg,#5a4a6a,#2f2740); }
-.app .icon.note{ background:linear-gradient(160deg,#6a5a3a,#3f341f); }
-.app .icon.call{ background:linear-gradient(160deg,#5a3a3a,#3a2222); }
-.app .icon.soc{ background:linear-gradient(160deg,#3a4a6a,#22293f); }
-.badge{ position:absolute; top:-4px; right:-4px; background:var(--alert); color:#fff; font-size:10px; font-weight:700; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 3px; }
-.app span{ font-size:10.5px; color:var(--ink-dim); }
-.home .footer-note{ margin-top:auto; text-align:center; font-size:11px; color:var(--ink-dim); padding-bottom:6px; }
-
-.appscreen{ position:absolute; inset:0; background:var(--bg); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .3s ease; z-index:30; }
-.appscreen.active{ transform:translateX(0); }
-.topbar{ display:flex; align-items:center; gap:10px; padding:52px 16px 14px; border-bottom:1px solid rgba(255,255,255,.06); background:var(--panel); flex-shrink:0; }
-.back{ background:none; border:none; color:var(--accent); font-size:15px; padding:4px 8px 4px 0; cursor:pointer; }
-.topbar h2{ font-size:16px; margin:0; font-weight:600; }
-.list{ flex:1; overflow-y:auto; padding:8px 0; }
-.list::-webkit-scrollbar{ display:none; }
-
-.thread-row{ display:flex; gap:12px; align-items:center; padding:11px 16px; border-bottom:1px solid rgba(255,255,255,.04); background:none; border-left:none; border-right:none; border-top:none; width:100%; color:var(--ink); font-family:inherit; text-align:left; cursor:pointer; }
-.avatar{ width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; flex-shrink:0; background:var(--panel-2); }
-.thread-row .meta{ flex:1; min-width:0; }
-.thread-row .name{ font-size:13.5px; font-weight:600; }
-.thread-row .preview{ font-size:11.5px; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.thread-row .time{ font-size:10.5px; color:var(--ink-dim); align-self:flex-start; }
-
-.chat{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:9px; }
-.bubble{ max-width:78%; padding:8px 12px; border-radius:16px; font-size:13px; line-height:1.4; }
-.bubble.them{ align-self:flex-start; background:var(--bubble-them); border-bottom-left-radius:4px; }
-.bubble.me{ align-self:flex-end; background:var(--bubble-me); border-bottom-right-radius:4px; }
-.bubble.clue{ box-shadow:0 0 0 1px var(--accent-dim); }
-.bubble.audio{ display:flex; align-items:center; gap:8px; font-style:italic; color:var(--ink-dim); }
-.stamp{ font-size:9.5px; color:var(--ink-dim); text-align:center; margin:4px 0; }
-.who{ font-size:10.5px; color:var(--accent); margin-bottom:-3px; margin-left:2px; }
-
-.gallery-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px; padding:2px; }
-.photo{ aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:24px; background:var(--panel-2); cursor:pointer; position:relative; }
-.photo-view{ padding:16px; }
-.photo-big{ width:100%; aspect-ratio:4/5; background:var(--panel-2); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:56px; margin-bottom:14px; }
-.photo-caption{ font-size:12.5px; color:var(--ink-dim); line-height:1.55; }
-.photo-caption b{ color:var(--ink); }
-
-.note-item{ padding:13px 16px; border-bottom:1px solid rgba(255,255,255,.05); }
-.note-item .n-title{ font-size:13.5px; font-weight:600; margin-bottom:3px; }
-.note-item .n-date{ font-size:10.5px; color:var(--ink-dim); margin-bottom:7px; }
-.note-item .n-body{ font-size:12.5px; color:#d8d3c6; line-height:1.6; white-space:pre-line; }
-.note-item.locked .n-body{ filter:blur(5px); user-select:none; transition:filter .25s ease; }
-.note-item.locked.open .n-body{ filter:none; }
-.unlock-tip{ font-size:11px; color:var(--accent); margin-top:6px; }
-
-.call-row{ display:flex; gap:12px; align-items:center; padding:11px 16px; border-bottom:1px solid rgba(255,255,255,.04); }
-.call-row .name{ font-size:13.5px; font-weight:600; }
-.call-row .sub{ font-size:11px; color:var(--ink-dim); margin-top:2px; }
-.call-row .sub.missed{ color:var(--alert); }
-.call-row .time{ margin-left:auto; font-size:10.5px; color:var(--ink-dim); }
-
-.soc-item{ padding:12px 16px; border-bottom:1px solid rgba(255,255,255,.05); font-size:12.5px; line-height:1.5; }
-.soc-item b{ color:var(--accent); }
-.soc-time{ font-size:10.5px; color:var(--ink-dim); margin-top:4px; }
-.pin-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; padding-top:40px; }
-.pin-title{ font-size:15px; margin-bottom:6px; }
-.pin-sub{ font-size:12px; color:var(--ink-dim); margin-bottom:22px; text-align:center; padding:0 30px; }
-.dots{ display:flex; gap:14px; margin-bottom:26px; }
-.dot{ width:13px; height:13px; border-radius:50%; border:1.5px solid var(--ink-dim); }
-.dot.on{ background:var(--accent); border-color:var(--accent); }
-.keys{ display:grid; grid-template-columns:repeat(3,70px); gap:14px; }
-.key{ height:60px; border-radius:50%; background:var(--panel-2); border:none; color:var(--ink); font-size:22px; font-family:inherit; cursor:pointer; }
-.key.blank{ background:none; }
-.shake{ animation:sh .35s; }
-@keyframes sh{ 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
-.tsec{ padding:11px 16px; border-bottom:1px solid rgba(255,255,255,.05); font-size:13.5px; font-weight:600; cursor:pointer; display:flex; justify-content:space-between; }
-.tbody{ display:none; }
-.tbody.open{ display:block; }
-</style>
-</head>
-<body>
-
-<div class="frame">
-  <div class="screen">
-    <div class="notch"></div>
-
-    <div class="lock" id="lock">
-      <div class="time">23:47</div>
-      <div class="date">sábado, 14 de setembro</div>
-      <div class="hint">deslize pra desbloquear — sem senha, ela nunca trancava o celular</div>
-      <button class="swipe-btn" onclick="document.getElementById('lock').classList.add('hidden')">desbloquear ↑</button>
-    </div>
-
-    <div class="home">
-      <div class="status">encontrado caído no sofá da cobertura, tela rachada, 23:58</div>
-      <div class="apps">
-        <button class="app" onclick="openApp('msg')"><div class="icon msg">💬<span class="badge">8</span></div><span>Mensagens</span></button>
-        <button class="app" onclick="openApp('gal')"><div class="icon gal">🖼️</div><span>Galeria</span></button>
-        <button class="app" onclick="openApp('note')"><div class="icon note">📝<span class="badge">1</span></div><span>Notas</span></button>
-        <button class="app" onclick="openApp('call')"><div class="icon call">📞</div><span>Ligações</span></button>
-        <button class="app" onclick="openApp('soc')"><div class="icon soc">🔔<span class="badge">2</span></div><span>Redes</span></button>
-        <button class="app" onclick="openApp('map')"><div class="icon call">📍</div><span>Localização</span></button>
-        <button class="app" onclick="openApp('sol')"><div class="icon note">🔍</div><span>Solução</span></button>
-        <button class="app" onclick="openApp('theo')"><div class="icon msg">🔒</div><span>Celular do Théo</span></button>
-      </div>
-      <div class="footer-note">celular de Bia · última atividade 23:53</div>
-    </div>
-
-    <!-- MENSAGENS: lista -->
-    <div class="appscreen" id="app-msg">
-      <div class="topbar"><button class="back" onclick="closeApp('msg')">‹ início</button><h2>Mensagens</h2></div>
-      <div class="list">
-        <button class="thread-row" onclick="openThread('grupo')">
-          <div class="avatar" style="background:#444">🎉</div>
-          <div class="meta"><div class="name">Cobertura da Bia 🎂</div><div class="preview">Pedro: vim só te dar oi, relaxa</div></div>
-          <div class="time">21:40</div>
-        </button>
-        <button class="thread-row" onclick="openThread('rafa')">
-          <div class="avatar" style="background:#3a5a52">R</div>
-          <div class="meta"><div class="name">Rafa</div><div class="preview">para de falar isso pra todo mundo, Bia</div></div>
-          <div class="time">22:40</div>
-        </button>
-        <button class="thread-row" onclick="openThread('duda')">
-          <div class="avatar" style="background:#5a4a6a">D</div>
-          <div class="meta"><div class="name">Duda</div><div class="preview">vi vocês dois conversando lá fora</div></div>
-          <div class="time">23:10</div>
-        </button>
-        <button class="thread-row" onclick="openThread('theo')">
-          <div class="avatar" style="background:#6a5a3a">T</div>
-          <div class="meta"><div class="name">Théo</div><div class="preview">desci uns 5 min só, já tô voltando</div></div>
-          <div class="time">23:51</div>
-        </button>
-        <button class="thread-row" onclick="openThread('carol')">
-          <div class="avatar" style="background:#3a6a5f">C</div>
-          <div class="meta"><div class="name">Carol</div><div class="preview">áudio (0:14)</div></div>
-          <div class="time">23:15</div>
-        </button>
-        <button class="thread-row" onclick="openThread('pedro')">
-          <div class="avatar" style="background:#6a3a3a">P</div>
-          <div class="meta"><div class="name">Pedro</div><div class="preview">eu só quero conversar, 5 minutos</div></div>
-          <div class="time">20:55</div>
-        </button>
-        <button class="thread-row" onclick="openThread('portaria')">
-          <div class="avatar" style="background:#333">🏢</div>
-          <div class="meta"><div class="name">Seu Jorge (portaria)</div><div class="preview">o carro do rapaz saiu 23:49</div></div>
-          <div class="time">23:56</div>
-        </button>
-        <button class="thread-row" onclick="openThread('neusa')">
-          <div class="avatar" style="background:#5a5a3a">N</div>
-          <div class="meta"><div class="name">Dona Neusa (vizinha)</div><div class="preview">mocinha ouvi gritaria na escada</div></div>
-          <div class="time">23:30</div>
-        </button>
-        <button class="thread-row" onclick="openThread('mae')">
-          <div class="avatar" style="background:#6a4a5a">❤</div>
-          <div class="meta"><div class="name">Mãe</div><div class="preview">filha, me liga amanhã cedo?</div></div>
-          <div class="time">18:10</div>
-        </button>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-grupo">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Cobertura da Bia 🎂</h2></div>
-      <div class="chat">
-        <div class="who">Duda</div><div class="bubble them">gentee chegando, subindo já</div>
-        <div class="who">Théo</div><div class="bubble them">comprei o bolo, tá lindo</div>
-        <div class="who">Rafa</div><div class="bubble them">alguém falou com o síndico sobre o som?</div>
-        <div class="who">Bia</div><div class="bubble me">falei sim, até meia-noite de boa</div>
-        <div class="who">Pedro</div><div class="bubble them clue">oi gente, sei que não fui exatamente convidado mas vim só te dar oi, relaxa Bia</div>
-        <div class="who">Carol</div><div class="bubble them">Pedro pelo amor, hoje não</div>
-        <div class="stamp">21:40 · 6 pessoas</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-rafa">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Rafa</h2></div>
-      <div class="chat">
-        <div class="stamp">semana passada</div>
-        <div class="bubble them">bia, tem 5 min? preciso te mostrar o caixa da rifa</div>
-        <div class="bubble me">manda aí</div>
-        <div class="bubble them">depois eu explico pessoalmente, é meio delicado</div>
-        <div class="bubble me">vc tá me assustando</div>
-        <div class="bubble them clue">confia em mim, só não comenta com ninguém ainda, principalmente com o Théo</div>
-        <div class="bubble me">por que com o Théo?</div>
-        <div class="bubble them">esquece, falei besteira. a gente conversa na festa</div>
-        <div class="bubble them">bia respira, isso não sai daqui</div>
-        <div class="bubble me clue">achei estranho o caixa da rifa não bater. falei com a Duda sobre isso hj</div>
-        <div class="bubble them">vc CONTOU pra Duda?? não tinha nada a ver com dinheiro sumido, foi erro de conta</div>
-        <div class="bubble me">então mostra a planilha pra mim de novo</div>
-        <div class="bubble them clue">para de falar isso pra todo mundo, Bia</div>
-        <div class="bubble me">vou falar na frente de todo mundo hoje se precisar</div>
-        <div class="bubble them">não faz isso, eu resolvo até domingo, juro</div>
-        <div class="stamp">22:40 · entregue</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-duda">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Duda</h2></div>
-      <div class="chat">
-        <div class="stamp">anteontem</div>
-        <div class="bubble them">amiga vc viu que o Théo tá sumido?</div>
-        <div class="bubble me">vi, tô tentando não pirar</div>
-        <div class="bubble them clue">não fala nada pra ele ainda, deixa eu descobrir uma coisa antes</div>
-        <div class="bubble me">descobrir o quê??</div>
-        <div class="bubble them">depois te conto, prometo. te amo</div>
-        <div class="bubble me">também te amo 💛</div>
-        <div class="bubble them">lembra que vcs ficaram juntos dia 3 de agosto? vc me ligou às 3 da manhã de tanta felicidade kkk</div>
-        <div class="bubble me">kkkk lembro, foi o melhor dia</div>
-        <div class="bubble them">seu vestido tá lindo hj boba</div>
-        <div class="bubble me">obrigada 💛 vem cá que eu preciso te contar uma coisa sobre o Rafa</div>
-        <div class="bubble them clue">vi vocês dois conversando lá fora, ele tava bem nervoso</div>
-        <div class="bubble me">é sobre a rifa da viagem, o valor não fecha</div>
-        <div class="bubble them">amanhã a gente resolve isso com calma, curte a festa hj</div>
-        <div class="bubble me">e desde quando vc defende o Rafa tanto assim?</div>
-        <div class="bubble them clue">não é isso, só não quero drama no seu niver</div>
-        <div class="stamp">23:10 · lida</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-theo">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Théo</h2></div>
-      <div class="chat">
-        <div class="stamp">ontem à noite</div>
-        <div class="bubble them">amor, amanhã vou chegar mais tarde, tenho um lance rápido antes</div>
-        <div class="bubble me">que lance?</div>
-        <div class="bubble them clue">coisa de trabalho, nada demais</div>
-        <div class="bubble me">sábado à noite, dia do meu aniversário?</div>
-        <div class="bubble them">é rapidinho, juro. vou compensar</div>
-        <div class="bubble me">tá bom...</div>
-        <div class="bubble them">cadê vc? o pessoal já cortou o bolo</div>
-        <div class="bubble me">desci até o carro pegar uma coisa, já subo</div>
-        <div class="bubble them clue">desci uns 5 min só, já tô voltando, espera aí</div>
-        <div class="bubble me">??? vc que sumiu, eu tô na cobertura inteira</div>
-        <div class="bubble them">deixa eu te ligar</div>
-        <div class="stamp">23:51 · entregue · não lida</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-carol">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Carol</h2></div>
-      <div class="chat">
-        <div class="stamp">sexta</div>
-        <div class="bubble them">oi Bia! sei que a gente não é tão próxima mas preciso te contar uma coisa</div>
-        <div class="bubble me">pode falar</div>
-        <div class="bubble them">pessoalmente é melhor. te procuro na festa</div>
-        <div class="bubble me">ok, agora fiquei curiosa</div>
-        <div class="bubble them">oi flor, dá pra descer no hall 2 minutinhos? preciso te mostrar uma coisa</div>
-        <div class="bubble me">agora? tô no meio da festa kkkk</div>
-        <div class="bubble them audio">🎙️ áudio (0:14)</div>
-        <div class="bubble them clue">é sobre o Théo, mas não é o que vc tá pensando, prometo</div>
-        <div class="bubble me">Carol vc tá me deixando nervosa</div>
-        <div class="stamp">23:15 · entregue</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-pedro">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Pedro</h2></div>
-      <div class="chat">
-        <div class="stamp">semana passada</div>
-        <div class="bubble them">oi, tudo bem? vi umas fotos suas e bateu saudade</div>
-        <div class="bubble me">Pedro, faz meses que a gente terminou</div>
-        <div class="bubble them">eu sei, desculpa. só queria saber se vc tá bem</div>
-        <div class="bubble me">tô ótima, obrigada. bom te ver bem também</div>
-        <div class="bubble them">soube que sua festa é hoje</div>
-        <div class="bubble them clue">eu só quero conversar, 5 minutos, prometo que não crio caso</div>
-        <div class="bubble me">Pedro por favor não vem, já conversamos sobre isso</div>
-        <div class="bubble them">tudo bem, respeito. só queria desejar feliz aniversário mesmo</div>
-        <div class="bubble them">feliz aniversário Bia. te amei um dia, isso não muda</div>
-        <div class="stamp">20:55 · lida</div>
-      </div>
-    </div>
-
-        <div class="appscreen" id="thread-portaria">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Seu Jorge (portaria)</h2></div>
-      <div class="chat">
-        <div class="bubble them">Dona Bia, o som já tá alto, lembra do horário</div>
-        <div class="bubble me">fica tranquilo, desligo à meia-noite</div>
-        <div class="bubble them">a senhora esperando mais convidado?</div>
-        <div class="bubble me">acho que não, por quê?</div>
-        <div class="bubble them clue">um rapaz subiu sem se identificar mais cedo, jaqueta escura</div>
-        <div class="bubble them">e agora há pouco o carro preto do namorado da senhora saiu da garagem, 23:49, com duas pessoas dentro</div>
-        <div class="bubble me">duas? o Théo saiu com alguém?</div>
-        <div class="bubble them clue">o vidro tava escuro, mas dava pra ver um vulto no banco de trás</div>
-        <div class="stamp">23:56 · não lida</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-neusa">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Dona Neusa (vizinha)</h2></div>
-      <div class="chat">
-        <div class="bubble them">Beatriz querida, festa boa hein</div>
-        <div class="bubble me">desculpa o barulho, Dona Neusa!</div>
-        <div class="bubble them">sem problema, mas ouvi gritaria na escada de incêndio há uns minutos</div>
-        <div class="bubble them clue">duas vozes de homem, uma dizia "ela não pode contar de jeito nenhum"</div>
-        <div class="bubble them">não quis me meter, mas fiquei preocupada. tá tudo bem aí?</div>
-        <div class="stamp">23:30 · lida</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="thread-mae">
-      <div class="topbar"><button class="back" onclick="backTo('msg')">‹</button><h2>Mãe</h2></div>
-      <div class="chat">
-        <div class="bubble them">feliz aniversário minha princesa!! 22 anos, meu Deus</div>
-        <div class="bubble me">obrigada mãe 💛</div>
-        <div class="bubble them">se divirta mas tome cuidado</div>
-        <div class="bubble them">aquele seu namorado me pareceu diferente no almoço de domingo</div>
-        <div class="bubble me clue">achei ele nervoso, olhando o celular o tempo todo</div>
-        <div class="bubble them">filha, me liga amanhã cedo?</div>
-        <div class="stamp">18:10 · lida</div>
-      </div>
-    </div>
-
-    <!-- GALERIA -->
-    <div class="appscreen" id="app-gal">
-      <div class="topbar"><button class="back" onclick="closeApp('gal')">‹ início</button><h2>Galeria</h2></div>
-      <div class="list">
-        <div class="gallery-grid">
-          <div class="photo" onclick="openPhoto('p1')">🎂</div>
-          <div class="photo" onclick="openPhoto('p2')">📋</div>
-          <div class="photo" onclick="openPhoto('p3')">🚗</div>
-          <div class="photo" onclick="openPhoto('p4')">🥂</div>
-          <div class="photo" onclick="openPhoto('p5')">🌃</div>
-          <div class="photo" onclick="openPhoto('p6')">📱</div>
-          <div class="photo" onclick="openPhoto('p7')">🚪</div>
-          <div class="photo" onclick="openPhoto('p8')">💐</div>
-          <div class="photo" onclick="openPhoto('p9')">🕯️</div>
-          <div class="photo" onclick="openPhoto('p10')">🧾</div>
-          <div class="photo" onclick="openPhoto('p11')">🪜</div>
-          <div class="photo" onclick="openPhoto('p12')">🧥</div>
-          <div class="photo" onclick="openPhoto('p13')">📸</div>
-          <div class="photo" onclick="openPhoto('p14')">🔑</div>
-          <div class="photo" onclick="openPhoto('p15')">🍾</div>
-          <div class="photo" onclick="openPhoto('p16')">💋</div>
-        </div>
-      </div>
-    </div>
-    <div class="appscreen" id="photo-p1"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>23:02</h2></div><div class="list photo-view"><div class="photo-big">🎂</div><div class="photo-caption">Bolo sendo cortado, todo mundo em volta. <b>Théo não aparece em nenhuma foto do corte</b>, mesmo dizendo que só desceu depois disso.</div></div></div>
-    <div class="appscreen" id="photo-p2"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>21:15</h2></div><div class="list photo-view"><div class="photo-big">📋</div><div class="photo-caption">Print de uma planilha da rifa da viagem. <b>Uma linha aparece editada</b>, com anotação rasurada ao lado: "confirmar c/ R antes de falar com o grupo".</div></div></div>
-    <div class="appscreen" id="photo-p3"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>23:48</h2></div><div class="list photo-view"><div class="photo-big">🚗</div><div class="photo-caption">Foto tremida do estacionamento, tirada sem querer (bolso). <b>Dá pra ver alguém parado perto do carro de Théo</b> ao longe, rosto não aparece.</div></div></div>
-    <div class="appscreen" id="photo-p4"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>22:05</h2></div><div class="list photo-view"><div class="photo-big">🥂</div><div class="photo-caption">Brinde do grupo. Rafa está com o celular na mão olhando pra tela, não pra câmera. Duda está de costas, olhando pra porta.</div></div></div>
-    <div class="appscreen" id="photo-p5"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>23:53</h2></div><div class="list photo-view"><div class="photo-big">🌃</div><div class="photo-caption"><b>Última foto tirada.</b> Vista da cobertura, tremida, fora de foco — parece ter sido disparada sem querer, quase caindo do celular.</div></div></div>
-    <div class="appscreen" id="photo-p6"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>19:40</h2></div><div class="list photo-view"><div class="photo-big">📱</div><div class="photo-caption">Print de notificação bancária: transferência recebida de "R. Almeida" horas antes da festa — mesma inicial do Rafa.</div></div></div>
-    <div class="appscreen" id="photo-p7"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>21:38</h2></div><div class="list photo-view"><div class="photo-big">🚪</div><div class="photo-caption">Foto da entrada tirada de brincadeira. <b>Pedro aparece parado no corredor</b>, do lado de fora da porta, minutos antes de aparecer no grupo dizendo que "só veio dar oi".</div></div></div>
-    <div class="appscreen" id="photo-p8"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>18:50</h2></div><div class="list photo-view"><div class="photo-big">💐</div><div class="photo-caption">Flores que chegaram de manhã, sem cartão. Bia comentou com Carol "acho que sei quem mandou, mas não vou falar nada hoje".</div></div></div>
-    <div class="appscreen" id="photo-p9"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>23:20</h2></div><div class="list photo-view"><div class="photo-big">🕯️</div><div class="photo-caption">Carol e Théo conversando no hall, sérios, perto do elevador — a mesma hora do áudio que Carol mandou pra Bia sobre "algo do Théo".</div></div></div>
-
-        <div class="appscreen" id="photo-p10"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>19:12</h2></div><div class="list photo-view"><div class="photo-big">🧾</div><div class="photo-caption">Recibo amassado achado no bolso do casaco do Rafa. <b>Um saque grande em dinheiro na mesma data em que sumiu parte da rifa</b>. Bia tirou foto escondida.</div></div></div>
-    <div class="appscreen" id="photo-p11"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>23:44</h2></div><div class="list photo-view"><div class="photo-big">🪜</div><div class="photo-caption">Escada de incêndio, foto escura. <b>Dois pares de sapato aparecem na borda do degrau</b>, um deles com o cadarço desamarrado igual ao tênis do Théo na foto do bolo.</div></div></div>
-    <div class="appscreen" id="photo-p12"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>20:30</h2></div><div class="list photo-view"><div class="photo-big">🧥</div><div class="photo-caption">Casacos empilhados no quarto. <b>A jaqueta escura de Pedro está ali com a etiqueta do bar onde ele trabalha</b>, ele nunca subiu além do corredor.</div></div></div>
-    <div class="appscreen" id="photo-p13"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>22:48</h2></div><div class="list photo-view"><div class="photo-big">📸</div><div class="photo-caption">Selfie da Bia com a Duda. Ao fundo, Rafa e Théo estão perto da janela, conversando baixo e olhando pra elas.</div></div></div>
-    <div class="appscreen" id="photo-p14"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>21:00</h2></div><div class="list photo-view"><div class="photo-big">🔑</div><div class="photo-caption">Chaveiro do carro do Théo em cima da mesa. <b>Tem uma segunda chave colada com fita</b>, de um cofre ou armário que Bia não reconhece.</div></div></div>
-    <div class="appscreen" id="photo-p15"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>23:30</h2></div><div class="list photo-view"><div class="photo-big">🍾</div><div class="photo-caption">Garrafa de espumante ainda fechada num canto. Bilhete preso: "pra comemorar quando tudo se resolver — R". Bia rabiscou "resolver o quê?" por cima.</div></div></div>
-
-        <div class="appscreen" id="photo-p16"><div class="topbar"><button class="back" onclick="backTo('gal')">‹</button><h2>03/08</h2></div><div class="list photo-view"><div class="photo-big">💋</div><div class="photo-caption">Foto antiga dos dois num mirante, legenda: <b>"nosso primeiro beijo ♥"</b>. A data no canto da foto é do dia 3 de agosto.</div></div></div>
-
-    <!-- NOTAS -->
-    <div class="appscreen" id="app-note">
-      <div class="topbar"><button class="back" onclick="closeApp('note')">‹ início</button><h2>Notas</h2></div>
-      <div class="list">
-        <div class="note-item">
-          <div class="n-title">sobre a rifa</div>
-          <div class="n-date">hoje, 20:58</div>
-          <div class="n-body">a planilha não fecha, faltam uns 400 conto
-preciso falar com o R antes que ele fale com todo mundo primeiro
-se for o que eu acho, hoje eu conto pra galera na festa mesmo</div>
-        </div>
-        <div class="note-item">
-          <div class="n-title">Théo distante</div>
-          <div class="n-date">3 dias atrás</div>
-          <div class="n-body">ele tá esquisito essa semana, some no celular por horas
-disse que é trampo mas nunca foi assim antes
-será que é coisa da minha cabeça</div>
-        </div>
-        <div class="note-item">
-          <div class="n-title">Pedro de novo</div>
-          <div class="n-date">2 dias atrás</div>
-          <div class="n-body">ele voltou a mandar mensagem depois de meses
-falei pro Théo, ele ficou putissimo, mais do que eu esperava
-disse "se ele aparecer na sua festa eu não respondo por mim"</div>
-        </div>
-        <div class="note-item">
-          <div class="n-title">lista de convidados</div>
-          <div class="n-date">3 dias atrás</div>
-          <div class="n-body">Rafa, Duda, Théo, Carol, Pedro (NÃO, mas ele sempre aparece)
-comprar gelo
-avisar o síndico sobre o som até meia-noite</div>
-        </div>
-        <div class="note-item">
-          <div class="n-title">celular do Théo</div>
-          <div class="n-date">mês passado</div>
-          <div class="n-body">a senha dele é sempre a data do nosso primeiro beijo, só dia e mês, quatro números
-ele acha que eu não sei kkkk
-(se um dia eu precisar entrar, é só lembrar do dia certo)</div>
-        </div>
-        <div class="note-item">
-          <div class="n-title">coisas que não fecham</div>
-          <div class="n-date">semana passada</div>
-          <div class="n-body">1. o caixa da rifa
-2. o Rafa e o Théo virando amigos do nada, os dois nunca se deram bem
-3. saque em dinheiro no nome do Rafa
-4. o Théo mentindo sobre onde estava na terça
-5. a chave com fita no chaveiro dele</div>
-        </div>
-        <div class="note-item">
-          <div class="n-title">plano pra festa</div>
-          <div class="n-date">ontem</div>
-          <div class="n-body">1. deixar a Carol falar primeiro
-2. confrontar o Rafa com o print do recibo
-3. observar a reação do Théo
-4. se der ruim, avisar a portaria
-(deixar a Duda de fora até ter certeza)</div>
-        </div>
-        <div class="note-item locked" id="locked-note" onclick="this.classList.toggle('open')">
-          <div class="n-title">🔒 particular</div>
-          <div class="n-date">hoje, 23:05</div>
-          <div class="n-body">Carol me falou uma coisa hoje que eu não queria ouvir no meu próprio aniversário
-ela viu o Théo e o Rafa se encontrando escondido semana passada
-os dois sabiam da rifa desde o início e escondiam de mim juntos
-não sei em quem confiar mais nessa festa</div>
-          <div class="unlock-tip">toque pra revelar</div>
-        </div>
-      </div>
-        <div class="note-item locked" onclick="this.classList.toggle('open')">
-          <div class="n-title">🔒 se acontecer algo comigo</div>
-          <div class="n-date">hoje, 23:40</div>
-          <div class="n-body">se eu sumir, olhem a rifa, o cofre da chave com fita e a escada de incêndio
-o Rafa desviou o dinheiro, o Théo ajudou a esconder e agora os dois têm medo que eu conte
-eu confio na Carol e na Duda, elas só não sabiam de tudo</div>
-          <div class="unlock-tip">toque pra revelar</div>
-        </div>
-    </div>
-
-    <!-- LIGAÇÕES -->
-    <div class="appscreen" id="app-call">
-      <div class="topbar"><button class="back" onclick="closeApp('call')">‹ início</button><h2>Ligações</h2></div>
-      <div class="list">
-        <div class="call-row"><div class="avatar" style="background:#6a4a5a">❤</div><div><div class="name">Mãe</div><div class="sub">recebida · 6 min</div></div><div class="time">18:10</div></div>
-        <div class="call-row"><div class="avatar" style="background:#6a5a3a">T</div><div><div class="name">Théo</div><div class="sub">recebida · 2 min</div></div><div class="time">19:30</div></div>
-        <div class="call-row"><div class="avatar" style="background:#6a3a3a">P</div><div><div class="name">Pedro</div><div class="sub missed">perdida</div></div><div class="time">20:50</div></div>
-        <div class="call-row"><div class="avatar" style="background:#5a4a6a">D</div><div><div class="name">Duda</div><div class="sub">recebida · 4 min</div></div><div class="time">22:20</div></div>
-        <div class="call-row"><div class="avatar" style="background:#3a5a52">R</div><div><div class="name">Rafa</div><div class="sub missed">perdida</div></div><div class="time">22:52</div></div>
-        <div class="call-row"><div class="avatar" style="background:#3a5a52">R</div><div><div class="name">Rafa</div><div class="sub missed">perdida</div></div><div class="time">22:53</div></div>
-        <div class="call-row"><div class="avatar" style="background:#3a6a5f">C</div><div><div class="name">Carol</div><div class="sub">feita · 1 min</div></div><div class="time">23:16</div></div>
-        <div class="call-row"><div class="avatar" style="background:#6a5a3a">T</div><div><div class="name">Théo</div><div class="sub">feita · 0:47</div></div><div class="time">23:45</div></div>
-        <div class="call-row"><div class="avatar" style="background:#333">portaria</div><div><div class="name">Portaria</div><div class="sub">recebida · 0:22</div></div><div class="time">23:49</div></div>
-        <div class="call-row"><div class="avatar" style="background:#333">desconhecido</div><div><div class="name">Número desconhecido</div><div class="sub missed">perdida</div></div><div class="time">23:50</div></div>
-        <div class="call-row"><div class="avatar" style="background:#6a5a3a">T</div><div><div class="name">Théo</div><div class="sub missed">perdida</div></div><div class="time">23:51</div></div>
-        <div class="call-row"><div class="avatar" style="background:#3a5a52">R</div><div><div class="name">Rafa</div><div class="sub missed">perdida</div></div><div class="time">23:52</div></div>
-      </div>
-    </div>
-
-    <!-- REDES -->
-    <div class="appscreen" id="app-soc">
-      <div class="topbar"><button class="back" onclick="closeApp('soc')">‹ início</button><h2>Redes</h2></div>
-      <div class="list">
-        <div class="soc-item"><b>Pedro</b> curtiu uma foto sua de 2 anos atrás<div class="soc-time">hoje, 14:02</div></div>
-        <div class="soc-item"><b>Carol</b> comentou "hoje à noite tudo vai fazer sentido, prometo" numa foto antiga sua com o Théo<div class="soc-time">hoje, 16:40</div></div>
-        <div class="soc-item"><b>Rafa</b> te marcou num story deletado 20 minutos depois de postar<div class="soc-time">hoje, 21:50</div></div>
-        <div class="soc-item"><b>Desconhecido</b> começou a seguir seu perfil às 23:40, sem foto, sem posts<div class="soc-time">hoje, 23:40</div></div>
-        <div class="soc-item"><b>Duda</b> postou e apagou um story: "amigas pra sempre" com sua foto<div class="soc-time">hoje, 22:12</div></div>
-        <div class="soc-item"><b>Théo</b> mudou o status pra "só pra quem importa" às 23:20<div class="soc-time">hoje, 23:20</div></div>
-        <div class="soc-item"><b>Carol</b> te enviou uma solicitação de "melhores amigos" com a mensagem "confia em mim"<div class="soc-time">hoje, 23:18</div></div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="app-map">
-      <div class="topbar"><button class="back" onclick="closeApp('map')">‹ início</button><h2>Localização</h2></div>
-      <div class="list">
-        <div class="soc-item"><b>19:05</b> Cobertura (casa)</div>
-        <div class="soc-item"><b>21:15 – 23:00</b> Cobertura, sala principal</div>
-        <div class="soc-item"><b>23:05</b> Cobertura, quarto (foi ler a nota trancada, ficou 6 min)</div>
-        <div class="soc-item"><b>23:44</b> Escada de incêndio, andar 12. O celular passa 8 minutos parado ali</div>
-        <div class="soc-item"><b>23:52</b> Cobertura, sofá. Sinal fraco, tela rachada, sem movimento depois disso</div>
-        <div class="soc-item"><b>23:58</b> Celular encontrado no sofá pela Duda</div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="app-sol">
-      <div class="topbar"><button class="back" onclick="closeApp('sol')">‹ início</button><h2>Solução</h2></div>
-      <div class="list" style="padding:16px">
-        <div class="photo-caption" id="sol-warn">Só toque quando a galera tiver votado. Não tem volta.</div>
-        <button class="swipe-btn" id="sol-btn" style="margin-top:14px;padding:12px 22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;color:var(--ink);font-size:14px;" onclick="document.getElementById('sol-txt').style.display='block';this.style.display='none';document.getElementById('sol-warn').style.display='none'">revelar solução</button>
-        <div id="sol-txt" class="photo-caption" style="display:none;line-height:1.7">
-          <b>Culpados: Rafa e Théo.</b><br><br>
-          Rafa desviou o dinheiro da rifa e Théo o ajudou a esconder. A Bia descobriu e ia contar na festa. Na hora do bolo, os dois levaram a Bia pela escada de incêndio pra convencê-la a calar. Ela tirou uma foto sem querer e largou o celular no sofá, marcando 23:52. Depois disso eles saíram no carro do Théo com ela (vulto no banco de trás, segundo o porteiro).<br><br>
-          <b>Inocentes:</b> Carol (tentou avisar), Pedro (foi embora antes, a jaqueta ficou no quarto) e Duda (sabia da rifa, mas não do plano).<br><br>
-          <b>Final secreto:</b> a Bia está no Sítio Boa Vista, com a tia do Théo, sã e salva. Eles só queriam mantê-la longe da festa até devolver o dinheiro.<br><br><b>Pistas-chave:</b> recibo do saque, corrida na escada, carro do Théo às 23:49, chave com fita e a nota "se acontecer algo comigo".
-        </div>
-      </div>
-    </div>
-
-    <div class="appscreen" id="app-theo">
-      <div class="topbar"><button class="back" onclick="closeApp('theo')">‹ início</button><h2>Celular do Théo</h2></div>
-      <div class="pin-wrap" id="pin-view">
-        <div class="pin-title">Digite a senha</div>
-        <div class="pin-sub">quatro números. você precisa descobrir nas pistas da Bia</div>
-        <div class="dots" id="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-        <div class="keys">
-          <button class="key" onclick="pin(1)">1</button><button class="key" onclick="pin(2)">2</button><button class="key" onclick="pin(3)">3</button>
-          <button class="key" onclick="pin(4)">4</button><button class="key" onclick="pin(5)">5</button><button class="key" onclick="pin(6)">6</button>
-          <button class="key" onclick="pin(7)">7</button><button class="key" onclick="pin(8)">8</button><button class="key" onclick="pin(9)">9</button>
-          <button class="key blank"></button><button class="key" onclick="pin(0)">0</button><button class="key" onclick="pinDel()">⌫</button>
-        </div>
-      </div>
-      <div class="list" id="theo-content" style="display:none">
-        <div class="tsec" onclick="tog('t-msg')">💬 Conversa com Rafa <span>›</span></div>
-        <div class="tbody" id="t-msg">
-          <div class="chat">
-            <div class="bubble them">a Bia tá desconfiando, ela vai contar hoje na festa</div>
-            <div class="bubble me clue">eu te falei pra devolver o dinheiro antes, cara</div>
-            <div class="bubble them">falta 400, tô juntando, só preciso de mais um dia</div>
-            <div class="bubble me">vou chamar ela pra escada às 23:40, a gente conversa</div>
-            <div class="bubble them clue">não deixa ela ir embora até eu chegar</div>
-            <div class="bubble me">e se ela gritar?</div>
-            <div class="bubble them">por isso a escada, o som tá alto, ninguém escuta</div>
-            <div class="bubble me clue">ela tá no meu carro. vou levar pro sítio da minha tia, domingo a gente resolve tudo. ninguém vai machucar ela, prometo</div>
-            <div class="bubble them">beleza. apaga essa conversa depois</div>
-            <div class="stamp">23:50 · lida</div>
-          </div>
-        </div>
-        <div class="tsec" onclick="tog('t-note')">📝 Notas <span>›</span></div>
-        <div class="tbody" id="t-note">
-          <div class="note-item"><div class="n-title">devolver a rifa</div><div class="n-date">ontem</div><div class="n-body">R$ 400 faltando. pedir emprestado pra mãe ou pro tio.
-falar com o Rafa pra parar de inventar desculpa.</div></div>
-          <div class="note-item"><div class="n-title">rascunho pra Bia (não enviado)</div><div class="n-date">hoje, 23:36</div><div class="n-body">Bia, eu errei feio. Eu devia ter contado pra você desde o começo. Quando isso acabar eu explico tudo e devolvo cada centavo.</div></div>
-        </div>
-        <div class="tsec" onclick="tog('t-pic')">🖼️ Fotos <span>›</span></div>
-        <div class="tbody" id="t-pic">
-          <div class="note-item"><div class="n-title">Comprovante Pix</div><div class="n-date">12/09</div><div class="n-body">R$ 1.200 para "R. Almeida". Legenda: "minha parte pra sumir com o caixa".</div></div>
-          <div class="note-item"><div class="n-title">Mapa do sítio</div><div class="n-date">hoje, 19:50</div><div class="n-body">Print do endereço: Sítio Boa Vista, estrada velha, 40 min da cidade. A Bia está lá, segura, com a tia do Théo cuidando dela.</div></div>
-        </div>
-        <div class="tsec" onclick="tog('t-call')">📞 Ligações <span>›</span></div>
-        <div class="tbody" id="t-call">
-          <div class="call-row"><div class="avatar" style="background:#3a5a52">R</div><div><div class="name">Rafa</div><div class="sub">feita · 3 min</div></div><div class="time">23:30</div></div>
-          <div class="call-row"><div class="avatar" style="background:#5a5a3a">🏡</div><div><div class="name">Tia Márcia</div><div class="sub">feita · 1 min</div></div><div class="time">23:47</div></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-function openApp(id){ document.getElementById('app-'+id).classList.add('active'); }
-function closeApp(id){ document.getElementById('app-'+id).classList.remove('active'); }
-function openThread(id){ document.getElementById('thread-'+id).classList.add('active'); }
-function openPhoto(id){ document.getElementById('photo-'+id).classList.add('active'); }
-var cur='';
-function pin(n){
-  if(cur.length>=4) return;
-  cur+=n; drawDots();
-  if(cur.length===4){
-    setTimeout(function(){
-      if(cur==='0308'){
-        document.getElementById('pin-view').style.display='none';
-        document.getElementById('theo-content').style.display='block';
-      } else {
-        var d=document.getElementById('dots'); d.classList.add('shake');
-        setTimeout(function(){ d.classList.remove('shake'); cur=''; drawDots(); },400);
-      }
-    },200);
-  }
-}
-function pinDel(){ cur=cur.slice(0,-1); drawDots(); }
-function drawDots(){
-  document.querySelectorAll('#dots .dot').forEach(function(el,i){ el.classList.toggle('on', i<cur.length); });
-}
-function tog(id){ document.getElementById(id).classList.toggle('open'); }
-function backTo(parentId){
-  document.querySelectorAll('.appscreen.active').forEach(function(el){
-    if(el.id.startsWith('thread-') || el.id.startsWith('photo-')) el.classList.remove('active');
-  });
-}
-</script>
-
-</body>
+<!DOCTYPE html>  <html lang="pt-BR">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">  
+<title>O Celular da Helena</title>  
+<style>  
+:root{  
+  --bg:#0d1416; --ink:#e9efee; --dim:#8a9a9a; --panel:#152024; --panel2:#1d2b30;  
+  --accent:#7fd1c7; --accent-dim:#3f7f78; --alert:#d1665a; --me:#24524d; --them:#1f2d33;  
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);  
+}  
+*{box-sizing:border-box;}  
+html{scroll-padding-top:env(safe-area-inset-top,0px);}  
+body{margin:0;min-height:100%;background:radial-gradient(ellipse at top,#16242a 0%,#070b0c 70%);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);padding:24px 12px;}  
+.frame{width:100%;max-width:380px;height:800px;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.7),inset 0 0 0 2px #2a2a2a;}  
+.screen{width:100%;height:100%;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column;}  
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:60;}  
+.lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:70px;background:linear-gradient(170deg,#1b3038 0%,#0d1416 65%);z-index:50;transition:transform .35s ease;}  
+.lock.hidden{transform:translateY(-100%);}  
+.lock .time{font-size:58px;font-weight:600;letter-spacing:-1px;}  
+.lock .date{font-size:15px;color:var(--dim);margin-top:4px;}  
+.lock .warn{margin-top:26px;background:rgba(255,255,255,.07);border-radius:14px;padding:10px 14px;font-size:12px;color:var(--dim);width:82%;line-height:1.5;}  
+.lock .hint{margin-top:auto;margin-bottom:30px;font-size:12.5px;color:var(--dim);text-align:center;padding:0 30px;}  
+.btn{padding:13px 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:20px;color:var(--ink);font-size:14px;cursor:pointer;font-family:inherit;}  
+.home{flex:1;display:flex;flex-direction:column;padding:46px 18px 14px;overflow-y:auto;}  
+.status{font-size:12px;color:var(--dim);text-align:center;}  
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;margin-top:18px;}  
+.app{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;color:var(--ink);font-family:inherit;cursor:pointer;}  
+.icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;background:var(--panel2);}  
+.badge{position:absolute;top:-4px;right:-4px;background:var(--alert);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}  
+.app span.l{font-size:10.5px;color:var(--dim);text-align:center;}  
+.foot{margin-top:auto;text-align:center;font-size:11px;color:var(--dim);padding-top:14px;}  
+.appscreen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;z-index:30;}  
+.appscreen.active{transform:translateX(0);}  
+.topbar{display:flex;align-items:center;gap:10px;padding:52px 16px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:var(--panel);flex-shrink:0;}  
+.back{background:none;border:none;color:var(--accent);font-size:20px;padding:0 8px 0 0;cursor:pointer;}  
+.topbar h2{font-size:16px;margin:0;font-weight:600;}  
+.list{flex:1;overflow-y:auto;padding:8px 0;}  
+.list::-webkit-scrollbar,.chat::-webkit-scrollbar{display:none;}  
+.row{display:flex;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}  
+.av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}  
+.row .m{flex:1;min-width:0;}  
+.row .n{font-size:13.5px;font-weight:600;}  
+.row .p{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}  
+.row .p.red{color:var(--alert);}  
+.row .t{font-size:10.5px;color:var(--dim);align-self:flex-start;}  
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;}  
+.b{max-width:80%;padding:8px 12px;border-radius:16px;font-size:13px;line-height:1.4;}  
+.b.t{align-self:flex-start;background:var(--them);border-bottom-left-radius:4px;}  
+.b.m{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px;}  
+.b.c{box-shadow:0 0 0 1px var(--accent-dim);}  
+.st{font-size:9.5px;color:var(--dim);text-align:center;margin:4px 0;}  
+.who{font-size:10.5px;color:var(--accent);margin-bottom:-4px;margin-left:2px;}  
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;}  
+.ph{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--panel2);cursor:pointer;}  
+.pv{padding:16px;}  
+.big{width:100%;aspect-ratio:4/5;background:var(--panel2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:14px;}  
+.cap{font-size:12.5px;color:var(--dim);line-height:1.6;}  
+.cap b{color:var(--ink);}  
+.note{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.05);}  
+.note .nt{font-size:13.5px;font-weight:600;margin-bottom:3px;}  
+.note .nd{font-size:10.5px;color:var(--dim);margin-bottom:7px;}  
+.note .nb{font-size:12.5px;color:#cfdad9;line-height:1.6;white-space:pre-line;}  
+.note.lk .nb{filter:blur(5px);user-select:none;transition:filter .25s;}  
+.note.lk.open .nb{filter:none;}  
+.tip{font-size:11px;color:var(--accent);margin-top:6px;}  
+.it{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px;line-height:1.55;}  
+.it b{color:var(--accent);}  
+.it .tm{font-size:10.5px;color:var(--dim);margin-top:4px;}  
+.it .body{margin-top:6px;color:#cfdad9;}  
+.pinw{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:40px;}  
+.dots{display:flex;gap:14px;margin:18px 0 26px;}  
+.dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--dim);}  
+.dot.on{background:var(--accent);border-color:var(--accent);}  
+.keys{display:grid;grid-template-columns:repeat(3,70px);gap:14px;}  
+.key{height:60px;border-radius:50%;background:var(--panel2);border:none;color:var(--ink);font-size:22px;font-family:inherit;cursor:pointer;}  
+.key.x{background:none;cursor:default;}  
+.shake{animation:sh .35s;}  
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}  
+</style>  
+</head>  
+<body>  
+<div class="frame"><div class="screen" id="scr">  
+<div class="notch"></div>  
+<div class="lock" id="lock">  
+  <div class="time">22:13</div>  
+  <div class="date">sexta-feira, 20 de setembro</div>  
+  <div class="warn">⚡ Sem energia na casa do lago desde 21:50. Tempestade forte. Estrada alagada.</div>  
+  <div class="hint">celular encontrado molhado na casa de barcos, 22:41. Sem senha: ela nunca trancava.</div>  
+  <button class="btn" onclick="document.getElementById('lock').classList.add('hidden')">desbloquear ↑</button>  
+</div>  
+<div class="home">  
+  <div class="status">Helena Braga, 29, jornalista · desaparecida desde as 22:12</div>  
+  <div class="apps" id="apps"></div>  
+  <div class="foot">bateria 4% · sinal fraco</div>  
+</div>  
+</div></div>  <script>  
+var scr=document.getElementById('scr'),stack=[],cur='';  
+function push(title,html,cls){  
+  var d=document.createElement('div');d.className='appscreen';  
+  d.innerHTML='<div class="topbar"><button class="back">‹</button><h2>'+title+'</h2></div><div class="'+(cls||'list')+'">'+html+'</div>';  
+  d.querySelector('.back').onclick=pop;scr.appendChild(d);  
+  requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('active');});});  
+  stack.push(d);return d;  
+}  
+function pop(){var d=stack.pop();if(!d)return;d.classList.remove('active');setTimeout(function(){d.remove();},300);}  
+var K={t:'b t',m:'b m',T:'b t c',M:'b m c'};  
+function chat(a){return a.map(function(x){  
+  if(x[0]==='s')return '<div class="st">'+x[1]+'</div>';  
+  return (x[2]?'<div class="who">'+x[2]+'</div>':'')+'<div class="'+K[x[0]]+'">'+x[1]+'</div>';}).join('');}  
+function rows(a,fn){return a.map(function(x,i){  
+  return '<div class="row" onclick="'+fn+'('+i+')"><div class="av" style="background:'+x.c+'">'+x.a+'</div><div class="m"><div class="n">'+x.n+'</div><div class="p '+(x.r?'red':'')+'">'+x.p+'</div></div><div class="t">'+x.t+'</div></div>';}).join('');}  
+function notes(a){return a.map(function(x){  
+  return '<div class="note'+(x.l?' lk" onclick="this.classList.toggle(\'open\')':'')+'"><div class="nt">'+(x.l?'🔒 ':'')+x.t+'</div><div class="nd">'+x.d+'</div><div class="nb">'+x.b+'</div>'+(x.l?'<div class="tip">toque pra revelar</div>':'')+'</div>';}).join('');}  
+function items(a){return a.map(function(x){  
+  return '<div class="it"><b>'+x.b+'</b>'+(x.x?'<div class="body">'+x.x+'</div>':'')+'<div class="tm">'+x.t+'</div></div>';}).join('');}  
+function photos(a,fn){return '<div class="grid">'+a.map(function(x,i){return '<div class="ph" onclick="'+fn+'('+i+')">'+x.e+'</div>';}).join('')+'</div>';}  
+function photoView(x){push(x.t,'<div class="big">'+x.e+'</div><div class="cap">'+x.c+'</div>','list pv');}  
+  
+/* ===================== CELULAR DA HELENA ===================== */  
+var TH=[  
+{a:'🏡',c:'#3a4a4a',n:'Fim de semana no Lago',p:'Marta: ninguém sai depois das 21h',t:'21:45',m:[  
+ ['t','Cheguei! A estrada tá horrível, mas o lago tá lindo','Caio'],['t','Vou deixar o jantar às 19h30, pontualidade!','Marta'],  
+ ['m','Vovô está bem? Quero vê-lo depois do jantar'],['t','Ele dorme cedo, querida. Amanhã.','Marta'],  
+ ['t','Falta luz, gente?? tudo apagou','Lívia'],['T','Ninguém sai da casa depois das 21h. A estrada alagou e o lago está perigoso.','Marta'],['t','Fica tranquila, eu cuido do gerador','Vinícius'],['s','21:45 · 5 pessoas']]},  
+{a:'M',c:'#6a3a4a',n:'Tia Marta',p:'deixe a papelada comigo, querida',t:'18:20',m:[  
+ ['s','quinta-feira'],['t','O vovô não pode se estressar. Deixe a papelada da fundação comigo.'],['m','Só quero ver os documentos, tia. É trabalho.'],  
+ ['T','Você sempre foi curiosa demais. Isso ainda vai te custar caro.'],['m','É uma ameaça?'],['t','É um conselho. Vamos aproveitar o fim de semana em família.'],['s','18:20 · lida']]},  
+{a:'V',c:'#3a5a7a',n:'Vinícius',p:'conversamos em qualquer lugar menos na sala',t:'21:58',m:[  
+ ['t','Helena, preciso conversar antes de você publicar qualquer coisa.'],['m','Sobre o laudo do vovô?'],['T','Não é o que você está pensando. Pelo bem dele, espera.'],  
+ ['m','Você assinou aquele papel, Vini.'],['t','Eu posso explicar tudo. Só não na sala, tem gente ouvindo.'],['m','Então onde?'],['T','Eu te aviso. Confia em mim uma última vez.'],['s','21:58 · entregue']]},  
+{a:'C',c:'#7a5a3a',n:'Caio (editor)',p:'ou você publica ou eu publico',t:'20:10',m:[  
+ ['t','A fonte confirmou. O prazo é segunda 8h.'],['m','Preciso de mais provas, Caio.'],['T','Ou você publica segunda, ou eu publico no seu lugar. Isso é um furo enorme.'],  
+ ['m','Não vou queimar meu nome com prova frágil.'],['t','Então prepare-se pra perder a matéria. A escolha é sua.'],['s','20:10 · lida']]},  
+{a:'L',c:'#5a6a3a',n:'Lívia (estagiária)',p:'deixei o pen drive no lugar combinado',t:'21:20',m:[  
+ ['t','Helena, deixei o pen drive no lugar combinado.'],['m','Obrigada. Ninguém sabe que foi você?'],['T','Ninguém. Mas eu achei uma coisa no notebook do Vinícius.'],  
+ ['t','A senha do celular dele deve ser o dia do pedido de casamento de vocês. Ele é previsível demais.'],['m','Nem lembro direito a data...'],['t','Vc tem foto do anel, procura. Agora apaga essa conversa!'],['s','21:20 · lida']]},  
+{a:'A',c:'#4a5a5a',n:'Seu Anselmo (caseiro)',p:'deixo o barco solto na doca',t:'21:52',m:[  
+ ['t','Dona Helena, a senhora não me viu, mas a Marta anda mexendo no cofre do seu Alberto.'],['T','Tem carro estranho no portão desde ontem. Placa de empresa.'],  
+ ['m','Obrigada, Anselmo. Estou juntando provas.'],['T','Esta noite deixo o barco solto na doca. Se precisar sumir, a senhora sabe onde eu guardo as redes.'],['s','21:52 · entregue']]},  
+{a:'⚖',c:'#5a4a6a',n:'Cartório Ferraz',p:'firma reconhecida sem comparecimento',t:'17:00',m:[  
+ ['t','Sra. Helena, sobre sua consulta: consta reconhecimento de firma do Sr. Alberto Braga em 12/09.'],['T','Porém o cartório não tem registro de comparecimento presencial. Pode ter sido feito por terceiros.'],['m','Dá pra emitir um comprovante disso?'],['t','Segunda-feira, com ofício. Por telefone não podemos.'],['s','17:00 · lida']]}  
+];  
+function openTH(i){push(TH[i].n,chat(TH[i].m),'chat');}  
+var PH=[  
+{e:'📄',t:'19:10',c:'Procuração em nome de Marta Braga. <b>A assinatura do vovô está tremida e diferente</b> de todas as anteriores.'},  
+{e:'🩺',t:'19:15',c:'Laudo médico assinado pelo Dr. Vinícius Pires declarando o avô «incapaz». <b>A data do laudo é anterior à consulta registrada</b> na agenda do vovô.'},  
+{e:'🚪',t:'20:05',c:'Placa no portão: <b>Orla Nova Empreendimentos</b>. Ninguém explicou por que uma construtora entra na propriedade.'},  
+{e:'🗄️',t:'20:30',c:'Escritório do vovô. <b>O cofre está aberto</b> e faltam pastas. Marta aparece refletida no vidro do armário.'},  
+{e:'👢',t:'21:55',c:'Pegadas de lama na varanda, do jardim até a casa de barcos. <b>Dois tamanhos diferentes</b>: um sapato social e uma bota.'},  
+{e:'⛵',t:'22:00',c:'Doca ao fundo, tempestade. <b>Um bote a remo está solto</b>, amarrado só por um nó frouxo.'},  
+{e:'💍',t:'03/08',c:'Foto antiga: Vinícius ajoelhado na varanda com o anel. Legenda: <b>«Ele me pediu em casamento hoje. 3 de agosto.»</b>'},  
+{e:'🍽️',t:'20:15',c:'Mesa do jantar. Marta e Vinícius trocam olhares; <b>Caio está com o celular embaixo da mesa</b>.'},  
+{e:'🌩️',t:'21:48',c:'Poste caído e casa no escuro. <b>Alguém desligou o gerador de propósito</b>: o quadro de força está aberto no fundo.'},  
+{e:'✉️',t:'21:53',c:'Bilhete debaixo da porta do quarto, letra irregular: <b>«Não vá à casa de barcos sozinha. Eles sabem.»</b>'},  
+{e:'🍳',t:'22:02',c:'Caio na cozinha comendo, <b>com o relógio da parede ao fundo marcando 22:02</b>. Ele não estava perto do lago.'},  
+{e:'💾',t:'21:20',c:'Lívia colocando algo dentro do relógio de pêndulo da varanda. <b>Um pen drive</b>, pelo brilho.'}  
+];  
+function openPH(i){photoView(PH[i]);}  
+var NT=[  
+{t:'Matéria: Fundação Braga',d:'quarta',b:'Hipótese: Marta usa a fundação pra vender o terreno do lago.\nComprador: Orla Nova.\nO problema: pra vender ela precisa de procuração do vovô.\nO vovô só perde o direito de decidir se for declarado incapaz.'},  
+{t:'Quem ganha se o vovô for declarado incapaz?',d:'ontem',b:'1. Marta: assume a procuração e vende\n2. Orla Nova: compra barato\n3. Quem assinou o laudo: comissão?\n4. Caio: o furo da carreira dele'},  
+{t:'O Vini',d:'mês passado',b:'A senha dele é sempre a data do pedido de casamento: dia e mês, quatro números.\nele acha que eu não sei kkk\nNunca pensei que ia precisar disso.'},  
+{t:'Quem ouviu o quê',d:'hoje, 20:50',b:'Marta não deixa eu falar com o vovô sozinha.\nO Anselmo parece assustado.\nA Lívia sabe mais do que diz.\nO Caio está pressionando demais.'},  
+{t:'se algo acontecer comigo',d:'hoje, 21:40',l:1,b:'Cópias de tudo no pen drive dentro do relógio da varanda.\nO Anselmo sabe onde eu escondo o resto.\nNão confiem no Vinícius, mesmo que ele diga que me ama.'},  
+{t:'plano B',d:'hoje, 21:55',l:1,b:'Se eu precisar sumir, uso o bote da doca e atravesso até a casa das redes do Anselmo.\nMinha luz vai estar apagada.\nQuem vier procurar no lago, vai achar só o celular.'}  
+];  
+var CL=[  
+{a:'V',c:'#3a5a7a',n:'Vinícius',p:'perdida',r:1,t:'21:35'},  
+{a:'M',c:'#6a3a4a',n:'Marta',p:'recebida · 2 min',t:'21:00'},  
+{a:'C',c:'#7a5a3a',n:'Caio',p:'recebida · 11 min',t:'20:10'},  
+{a:'A',c:'#4a5a5a',n:'Seu Anselmo',p:'recebida · 0:19',t:'21:52'},  
+{a:'?',c:'#333',n:'Número desconhecido',p:'perdida',r:1,t:'22:04'},  
+{a:'?',c:'#333',n:'Número desconhecido',p:'perdida',r:1,t:'22:09'},  
+{a:'⚖',c:'#5a4a6a',n:'Cartório Ferraz',p:'feita · 3 min',t:'17:00'}  
+];  
+var SO=[  
+{b:'Caio',x:'apagou um story às 20:42: «Prazo é segunda. Ninguém segura essa matéria.»',t:'hoje'},  
+{b:'Orla Nova Empreendimentos',x:'começou a seguir seu perfil. Antes disso, só seguia Marta.',t:'hoje, 19:00'},  
+{b:'Marta',x:'publicou foto com um homem de terno na varanda: «Parceiros de longa data»',t:'hoje, 18:45'},  
+{b:'Lívia',x:'te enviou pedido de «melhores amigos» com a mensagem «confia em mim»',t:'hoje, 21:10'},  
+{b:'Desconhecido',x:'viu seu story 6 vezes às 22:00. Perfil sem foto.',t:'hoje, 22:00'}  
+];  
+var EM=[  
+{b:'Orla Nova: Reunião de assinatura',x:'Confirmamos a reunião de 23/09 para assinatura da escritura. Conforme combinado, a procuração de Marta Braga será apresentada.',t:'ontem'},  
+{b:'Cartório Ferraz: Firma reconhecida',x:'Prezada, o reconhecimento de firma do Sr. Alberto Braga em 12/09 foi feito sem comparecimento.',t:'quinta'},  
+{b:'Vinícius Pires: Sobre o laudo',x:'Precisamos conversar antes que isso vire um problema maior. Vem sozinha.',t:'hoje, 09:12'},  
+{b:'Caio: PRAZO',x:'Segunda 8h, sem desculpa. Ou sai com seu nome ou sai sem.',t:'hoje, 07:50'},  
+{b:'Rascunho: título da matéria',x:'«Fundação Braga: como um laudo pode ter roubado o lago de uma família»',t:'rascunho'}  
+];  
+var AG=[  
+{b:'Jantar em família',x:'19:30, sala principal. Presença obrigatória.',t:'hoje'},  
+{b:'Conversar com o vovô sozinha',x:'21:00. Marta bloqueou: «ele está dormindo».',t:'hoje'},  
+{b:'Casa de barcos, 22:00',x:'Lembrete criado por Helena: «só sair se o Anselmo confirmar que está seguro».',t:'hoje'},  
+{b:'Publicar matéria',x:'Segunda, 08:00. Caio já avisou o jurídico.',t:'segunda'},  
+{b:'Reunião Orla Nova',x:'23/09. Anotação: «se a procuração vale, a escritura sai. Preciso impedir antes».',t:'próxima segunda'}  
+];  
+var GR=[  
+{b:'Gravador 1',x:'Transcrição: «...assina logo, o laudo já está pronto... só falta ela não descobrir antes de segunda...» (voz abafada, atrás de uma porta)',t:'hoje, 20:40'},  
+{b:'Gravador 2',x:'Transcrição: «Se eu não voltar pra sala até 22:30, chequem o relógio da varanda.»',t:'hoje, 21:47'},  
+{b:'Gravador 3',x:'Transcrição: vento e chuva forte, passos rápidos na madeira... «Quem está aí?»... corta.',t:'hoje, 22:03'}  
+];  
+var SA=[  
+{b:'Passos',x:'De 22:05 a 22:12: 412 passos, indo do jardim até a casa de barcos.',t:'hoje'},  
+{b:'Batimentos',x:'Pico de 148 bpm às 22:09. Depois cai para 96 bpm às 22:11, como se ela tivesse se afastado do perigo.',t:'hoje'},  
+{b:'Última atividade',x:'22:12: celular parado por 29 minutos, até ser encontrado por Lívia às 22:41.',t:'hoje'}  
+];  
+var LO=[  
+{b:'19:05',x:'Casa principal',t:'chegada'},  
+{b:'20:40',x:'Escritório do vovô, 6 minutos',t:'hoje'},  
+{b:'21:47',x:'Varanda, perto do relógio de pêndulo',t:'hoje'},  
+{b:'22:05',x:'Jardim, caminhando para a casa de barcos',t:'hoje'},  
+{b:'22:12',x:'Casa de barcos. Depois disso o celular não se move. Doca próxima. Sinal do GPS vai e volta.',t:'hoje'},  
+{b:'22:41',x:'Celular encontrado por Lívia, molhado e no chão',t:'hoje'}  
+];  
+  
+/* ===================== CELULAR DO VINÍCIUS ===================== */  
+var VM=[  
+ ['s','ontem'],['t','Ela está desconfiada. O laudo precisa estar no cartório antes de segunda.','Marta'],  
+ ['m','Marta, eu não sei se consigo continuar com isso.'],['T','Você já assinou. Se cair, cai junto.','Marta'],  
+ ['s','hoje, 21:59'],['T','Fale com ela na casa de barcos. Eu cuido do resto.','Marta'],['M','Ela não pode se machucar. Prometa.'],  
+ ['t','Ninguém vai encostar nela. Só quero o pen drive.','Marta'],  
+ ['s','22:14'],['M','Ela não está aqui. O barco sumiu e o celular dela ficou no chão.'],['T','Procure na doca. E não deixe o Anselmo chegar perto.','Marta']  
+];  
+var VN=[  
+{t:'Laudo do vovô',d:'12/09',b:'Assinei sem examinar. Marta disse que era só formalidade.\nO cartório não vai perceber a data.'},  
+{t:'Comissão Orla Nova',d:'semana passada',b:'R$ 180.000 de «consultoria médica».\nMarta jura que ninguém sai machucado.'},  
+{t:'confessar pro vovô?',d:'hoje, 22:30',b:'Eu não queria isso.\nSe a Helena publicar, acabou pra mim.\nSe eu contar, acabou pra Marta. Mas o vovô merece saber.'}  
+];  
+var VE=[  
+{b:'Orla Nova: Contrato de consultoria',x:'Anexo: honorários de R$ 180.000 condicionados à conclusão da escritura.',t:'segunda passada'},  
+{b:'Marta: sem provas',x:'Apague o e-mail do laudo. Nada de rastros.',t:'quinta'}  
+];  
+var VG=[  
+{b:'Áudio de Marta (encaminhado)',x:'«Quando o vovô se for, a fundação vem pra mim de qualquer jeito. Só estamos antecipando o inevitável.»',t:'quinta'}  
+];  
+var VP=[{e:'📸',t:'12/09',c:'Foto do laudo com o carimbo do cartório. <b>A data de emissão foi rasurada à mão</b>.'}];  
+function pin(n){  
+  if(cur.length>=4)return;cur+=n;dots();  
+  if(cur.length===4){setTimeout(function(){  
+    if(cur==='0308'){pop();cur='';vhome();}  
+    else{var d=document.getElementById('dots');d.classList.add('shake');setTimeout(function(){d.classList.remove('shake');cur='';dots();},400);}  
+  },200);}  
+}  
+function pinDel(){cur=cur.slice(0,-1);dots();}  
+function dots(){var e=document.querySelectorAll('#dots .dot');for(var i=0;i<e.length;i++)e[i].classList.toggle('on',i<cur.length);}  
+function openPin(){  
+  cur='';var k='';  
+  for(var i=1;i<=9;i++)k+='<button class="key" onclick="pin('+i+')">'+i+'</button>';  
+  k+='<button class="key x"></button><button class="key" onclick="pin(0)">0</button><button class="key" onclick="pinDel()">⌫</button>';  
+  push('Celular do Vinícius','<div style="font-size:15px">Digite a senha</div><div class="cap" style="text-align:center;padding:6px 30px 0">quatro números. Ele mantém a mesma senha há anos.</div><div class="dots" id="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="keys">'+k+'</div>','pinw');  
+}  
+function vhome(){  
+  push('Celular do Vinícius','<div class="apps" style="padding:14px 18px">'+  
+  [['💬','Mensagens','vmsg'],['📝','Notas','vnote'],['✉️','E-mail','vmail'],['🎙️','Gravador','vrec'],['🖼️','Fotos','vpic']].map(function(x){  
+   return '<button class="app" onclick="'+x[2]+'()"><div class="icon">'+x[0]+'</div><span class="l">'+x[1]+'</span></button>';}).join('')+'</div>');  
+}  
+function vmsg(){push('Marta',chat(VM),'chat');}  
+function vnote(){push('Notas',notes(VN));}  
+function vmail(){push('E-mail',items(VE));}  
+function vrec(){push('Gravador',items(VG));}  
+function vpic(){push('Fotos','<div class="grid"><div class="ph" onclick="photoView(VP[0])">📸</div></div>');}  
+  
+/* ===================== SOLUÇÃO ===================== */  
+function openSol(){  
+  push('Solução','<div class="cap" style="padding:16px" id="sw">Só toque quando todo mundo votou. Não tem volta.<br><br><button class="btn" onclick="document.getElementById(\'st\').style.display=\'block\';document.getElementById(\'sw\').style.display=\'none\'">revelar solução</button></div>'+  
+  '<div id="st" class="cap" style="display:none;padding:16px;line-height:1.7"><b>Vilões: Marta e Vinícius.</b><br><br>Marta queria vender o terreno do lago para a Orla Nova e, para isso, precisava da procuração do avô. O Dr. Vinícius assinou um laudo falso, recebendo R$ 180 mil. Helena descobriu tudo e ia publicar. No dia da tempestade, os dois desligaram o gerador e mandaram Vinícius atrair Helena até a casa de barcos para pegar o pen drive.<br><br><b>Inocentes:</b> Caio (pressionava pelo furo, mas está na foto da cozinha às 22:02), Lívia (aliada, deixou o pen drive e achou o celular) e Seu Anselmo (avisou Helena e deixou o bote solto).<br><br><b>Final secreto:</b> ninguém sequestrou Helena. Ela ouviu passos, largou o celular de propósito e fugiu de bote até a casa das redes do Anselmo, do outro lado do lago. Está sã e salva e já tem as provas no pen drive do relógio da varanda.<br><br><b>Pistas-chave:</b> laudo com data errada, cofre aberto, dois pares de pegada, gerador desligado, mensagens do Vinícius e da Marta e o celular do Vinícius (senha 0308).</div>');  
+}  
+  
+/* ===================== HOME ===================== */  
+var APP=[  
+ ['💬','Mensagens',function(){push('Mensagens',rows(TH.map(function(x){return {a:x.a,c:x.c,n:x.n,p:x.p,t:x.t};}),'openTH'));},9],  
+ ['🖼️','Galeria',function(){push('Galeria',photos(PH,'openPH'));}],  
+ ['📝','Notas',function(){push('Notas',notes(NT));},2],  
+ ['📞','Ligações',function(){push('Ligações',rows(CL,'void'));}],  
+ ['🔔','Redes',function(){push('Redes',items(SO));},3],  
+ ['✉️','E-mail',function(){push('E-mail',items(EM));},5],  
+ ['📅','Agenda',function(){push('Agenda',items(AG));}],  
+ ['🎙️','Gravador',function(){push('Gravador',items(GR));},3],  
+ ['❤️','Saúde',function(){push('Saúde',items(SA));}],  
+ ['📍','Localização',function(){push('Localização',items(LO));}],  
+ ['🔒','Celular do Vinícius',openPin],  
+ ['🔍','Solução',openSol]  
+];  
+document.getElementById('apps').innerHTML='';  
+APP.forEach(function(a){  
+  var b=document.createElement('button');b.className='app';  
+  b.innerHTML='<div class="icon">'+a[0]+(a[3]?'<span class="badge">'+a[3]+'</span>':'')+'</div><span class="l">'+a[1]+'</span>';  
+  b.onclick=a[2];document.getElementById('apps').appendChild(b);  
+});  
+function void0(){}  
+window['void']=void0;  
+</script>  </body>  
 </html>
