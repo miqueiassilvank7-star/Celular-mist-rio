@@ -3,73 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>O Celular Misterioso — Capítulos</title>
+<title>O Celular Misterioso</title>
 <style>
-:root{
-  --bg:#0d0e12; --ink:#eceae6; --dim:#8f8d87; --panel:#17181c; --accent:#d4a24a;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
 *{box-sizing:border-box;}
-body{
-  margin:0;min-height:100%;background:radial-gradient(ellipse at top,#1a1c22 0%,#08090a 70%);
-  display:flex;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  color:var(--ink);padding:40px 16px;
-}
-.wrap{width:100%;max-width:440px;}
-h1{font-size:22px;margin:0 0 4px;}
-.sub{color:var(--dim);font-size:13.5px;margin-bottom:28px;line-height:1.5;}
-.card{
-  display:flex;align-items:center;gap:14px;background:var(--panel);
-  border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px;margin-bottom:12px;
-  text-decoration:none;color:var(--ink);
-}
-.card.locked{opacity:.45;}
-.num{
-  width:44px;height:44px;border-radius:12px;background:#000;display:flex;align-items:center;
-  justify-content:center;font-weight:700;color:var(--accent);flex-shrink:0;font-size:16px;
-}
-.card .t{font-size:15px;font-weight:600;}
-.card .d{font-size:12px;color:var(--dim);margin-top:2px;}
-.tag{margin-left:auto;font-size:10.5px;color:var(--dim);white-space:nowrap;}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#16121b 0%,#050406 75%);color:#efe9ec;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:calc(28px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px));}
+main{max-width:520px;margin:0 auto;}
+h1{font-size:28px;margin:0 0 10px;}
+.sub{color:#938c92;line-height:1.55;margin:0 0 30px;font-size:16px;}
+.card{display:flex;align-items:center;gap:16px;background:#18131c;border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:16px;margin-bottom:14px;text-decoration:none;color:inherit;}
+.num{width:60px;height:60px;border-radius:16px;background:#000;color:#d9a441;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.info{flex:1;min-width:0;}
+.info b{display:block;font-size:17px;margin-bottom:4px;}
+.info span{font-size:14px;color:#938c92;line-height:1.4;}
+.lvl{font-size:13px;color:#938c92;text-align:right;}
+.lvl.hot{color:#e0537a;font-weight:600;}
+.soon{opacity:.35;pointer-events:none;}
 </style>
 </head>
 <body>
-<div class="wrap">
+<main>
   <h1>📱 O Celular Misterioso</h1>
-  <div class="sub">Cada capítulo é uma vítima diferente, um celular achado depois de um sumiço. Investigue os apps, descubra as senhas escondidas e chegue à solução.</div>
+  <p class="sub">Cada capítulo é uma vítima diferente, um celular achado depois de um sumiço. Investigue os apps, descubra as senhas escondidas e chegue à solução.</p>
 
-  <a class="card" href="capitulo1.html">
-    <div class="num">1</div>
-    <div><div class="t">O Celular da Helena</div><div class="d">Casa no lago, tempestade, uma família dividida.</div></div>
-    <div class="tag">fácil</div>
-  </a>
-
-  <a class="card" href="capitulo2.html">
-    <div class="num">2</div>
-    <div><div class="t">O Celular da Aline</div><div class="d">Startup, fraude de investidores, festa de lançamento.</div></div>
-    <div class="tag">médio</div>
-  </a>
-
-  <a class="card" href="capitulo3.html">
-    <div class="num">3</div>
-    <div><div class="t">O Celular da Camila</div><div class="d">Casamento, apagão, uma dívida escondida.</div></div>
-    <div class="tag">difícil</div>
-  </a>
-  <a class="card" href="capitulo4.html">
-    <div class="num">4</div>
-    <div><div class="t">O Celular da Yasmin</div><div class="d">Live beneficente, doações desviadas, apagão.</div></div>
-    <div class="tag">muito difícil</div>
-  </a>
-  <div class="card locked">
-    <div class="num">5</div>
-    <div><div class="t">Em breve</div><div class="d">Novo caso, mais difícil, mais senhas encadeadas.</div></div>
-    <div class="tag">em breve</div>
-  </div>
-  <div class="card locked">
-    <div class="num">6</div>
-    <div><div class="t">Em breve</div><div class="d">Novo caso, mais difícil, mais senhas encadeadas.</div></div>
-    <div class="tag">em breve</div>
-  </div>
-</div>
+  <a class="card" href="capitulo1.html"><div class="num">1</div><div class="info"><b>O Celular da Helena</b><span>Casa no lago, tempestade, uma família dividida.</span></div><div class="lvl">fácil</div></a>
+  <a class="card" href="capitulo2.html"><div class="num">2</div><div class="info"><b>O Celular da Aline</b><span>Startup, fraude de investidores, festa de lançamento.</span></div><div class="lvl">médio</div></a>
+  <a class="card" href="capitulo3.html"><div class="num">3</div><div class="info"><b>O Celular da Camila</b><span>Casamento, apagão, uma dívida escondida.</span></div><div class="lvl">difícil</div></a>
+  <a class="card" href="capitulo4.html"><div class="num">4</div><div class="info"><b>O Celular da Yasmin</b><span>Live beneficente, doações desviadas, apagão.</span></div><div class="lvl">muito difícil</div></a>
+  <a class="card" href="capitulo5.html"><div class="num">5</div><div class="info"><b>O Celular da Bella</b><span>Show de lançamento, apagão, royalties desaparecidos.</span></div><div class="lvl hot">extremo</div></a>
+  <div class="card soon"><div class="num">6</div><div class="info"><b>Em breve</b><span>Novo caso, mais difícil, mais senhas encadeadas.</span></div><div class="lvl">em breve</div></div>
+</main>
 </body>
 </html>

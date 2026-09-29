@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Capítulo 5 · O Celular da Bella</title>
+<style>
+:root{--bg:#0e0b12;--ink:#efe9ec;--dim:#938c92;--panel:#18131c;--panel2:#211a26;--accent:#e0537a;--accent-dim:#7a2c46;--alert:#d0564a;--me:#4a1f3a;--them:#221c26;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+*{box-sizing:border-box;}
+html,body{min-height:100%;}
+body{margin:0;background:radial-gradient(ellipse at top,#1c1522 0%,#08060a 70%);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);padding:24px 12px;}
+.frame{width:100%;max-width:380px;height:800px;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.7),inset 0 0 0 2px #2a2a2a;}
+.screen{width:100%;height:100%;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column;}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:110;}
+.toast{position:absolute;top:32px;left:8px;right:8px;background:rgba(22,17,22,.94);backdrop-filter:blur(6px);border-radius:16px;padding:10px 12px;display:flex;gap:10px;align-items:center;z-index:100;transform:translateY(-160%);transition:transform .35s ease;box-shadow:0 10px 30px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.06);}
+.toast.show{transform:translateY(0);}
+.toast .tav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.toast .tt{flex:1;min-width:0;}
+.toast .tn{font-size:12px;font-weight:600;}
+.toast .tm{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tp i{display:inline-block;width:5px;height:5px;margin:0 1.5px;border-radius:50%;background:var(--dim);animation:bl 1s infinite;}
+.tp i:nth-child(2){animation-delay:.2s}.tp i:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,60%,100%{opacity:.25}30%{opacity:1}}
+.b.typ{padding:11px 14px}
+.lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:70px;background:linear-gradient(170deg,#221a26 0%,#0e0b12 65%);z-index:50;transition:transform .35s ease;}
+.lock.hidden{transform:translateY(-100%);}
+.lock .time{font-size:58px;font-weight:600;letter-spacing:-1px;}
+.lock .date{font-size:15px;color:var(--dim);margin-top:4px;text-align:center;padding:0 20px;}
+.lock .warn{margin-top:26px;background:rgba(255,255,255,.07);border-radius:14px;padding:10px 14px;font-size:12px;color:var(--dim);width:82%;line-height:1.5;}
+.lock .hint{margin-top:auto;margin-bottom:30px;font-size:12.5px;color:var(--dim);text-align:center;padding:0 30px;}
+.btn{padding:13px 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:20px;color:var(--ink);font-size:14px;cursor:pointer;font-family:inherit;}
+.home{flex:1;display:flex;flex-direction:column;padding:44px 16px 14px;overflow-y:auto;}
+.status{font-size:11.5px;color:var(--dim);text-align:center;}
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px;margin-top:14px;}
+.app{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;color:var(--ink);font-family:inherit;cursor:pointer;}
+.icon{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:21px;position:relative;background:var(--panel2);}
+.badge{position:absolute;top:-4px;right:-4px;background:var(--alert);color:#fff;font-size:9.5px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.app span.l{font-size:9.5px;color:var(--dim);text-align:center;}
+.foot{margin-top:auto;text-align:center;font-size:11px;color:var(--dim);padding-top:12px;}
+.appscreen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;z-index:30;}
+.appscreen.active{transform:translateX(0);}
+.topbar{display:flex;align-items:center;gap:10px;padding:52px 16px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:var(--panel);flex-shrink:0;}
+.back{background:none;border:none;color:var(--accent);font-size:20px;padding:0 8px 0 0;cursor:pointer;}
+.topbar h2{font-size:15px;margin:0;font-weight:600;}
+.list{flex:1;overflow-y:auto;padding:8px 0;}
+.list::-webkit-scrollbar,.chat::-webkit-scrollbar{display:none;}
+.row{display:flex;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}
+.av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
+.row .m{flex:1;min-width:0;}
+.row .n{font-size:13.5px;font-weight:600;}
+.row .p{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .p.red{color:var(--alert);}
+.row .t{font-size:10.5px;color:var(--dim);align-self:flex-start;}
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;}
+.b{max-width:80%;padding:8px 12px;border-radius:16px;font-size:13px;line-height:1.4;}
+.b.t{align-self:flex-start;background:var(--them);border-bottom-left-radius:4px;}
+.b.m{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px;}
+.b.c{box-shadow:0 0 0 1px var(--accent-dim);}
+.st{font-size:9.5px;color:var(--dim);text-align:center;margin:4px 0;}
+.who{font-size:10.5px;color:var(--accent);margin-bottom:-4px;margin-left:2px;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;}
+.ph{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--panel2);cursor:pointer;}
+.pv{padding:16px;}
+.big{width:100%;aspect-ratio:4/5;background:var(--panel2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:14px;}
+.cap{font-size:12.5px;color:var(--dim);line-height:1.6;}
+.cap b{color:var(--ink);}
+.note{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.note .nt{font-size:13.5px;font-weight:600;margin-bottom:3px;}
+.note .nd{font-size:10.5px;color:var(--dim);margin-bottom:7px;}
+.note .nb{font-size:12.5px;color:#ddd6da;line-height:1.6;white-space:pre-line;}
+.it{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px;line-height:1.55;}
+.it b{color:var(--accent);}
+.it .tm{font-size:10.5px;color:var(--dim);margin-top:4px;}
+.it .body{margin-top:6px;color:#ddd6da;}
+.pinw{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:40px;}
+.dots{display:flex;gap:14px;margin:18px 0 26px;}
+.dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--dim);}
+.dot.on{background:var(--accent);border-color:var(--accent);}
+.keys{display:grid;grid-template-columns:repeat(3,70px);gap:14px;}
+.key{height:60px;border-radius:50%;background:var(--panel2);border:none;color:var(--ink);font-size:22px;font-family:inherit;cursor:pointer;}
+.key.x{background:none;cursor:default;}
+.shake{animation:sh .35s;}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.bk{padding:16px;}
+.pg{background:#efe4d3;color:#2b2226;border-radius:6px 12px 12px 6px;padding:22px 18px;min-height:440px;box-shadow:inset 10px 0 14px -10px rgba(0,0,0,.45);font-family:Georgia,serif;}
+.pg.fr{animation:fr .35s ease;}.pg.fl{animation:fl .35s ease;}
+@keyframes fr{from{opacity:0;transform:translateX(34px) rotateY(-14deg)}to{opacity:1;transform:none}}
+@keyframes fl{from{opacity:0;transform:translateX(-34px) rotateY(14deg)}to{opacity:1;transform:none}}
+.pt{font-weight:700;font-size:15px;margin-bottom:12px;}
+.pb{white-space:pre-line;font-size:13.5px;line-height:1.75;}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:var(--dim);font-size:12px;}
+.nav .btn{padding:9px 20px;}
+</style>
+</head>
+<body>
+<div class="frame"><div class="screen" id="scr">
+<div class="notch"></div>
+<div class="lock" id="lock">
+  <div class="time">23:16</div>
+  <div class="date">sábado, 9 de novembro — noite do lançamento</div>
+  <div class="warn">🎸 Apagão no palco durante o show de lançamento do álbum "Rosa Elétrica". Luzes voltaram em 4 minutos, mas a vocalista não voltou ao palco.</div>
+  <div class="hint">celular achado no camarim, atrás do sofá. Sem senha: ela nunca trancava a tela.</div>
+  <button class="btn" onclick="document.getElementById('lock').classList.add('hidden');startToasts();">desbloquear ↑</button>
+</div>
+<div class="home">
+  <a href="index.html" style="display:block;font-size:12px;color:#e0537a;text-decoration:none;margin-bottom:8px">‹ Capítulos</a><div class="status">Bella Duarte, 25, vocalista da Rosa Elétrica · desaparecida desde as 23:11</div>
+  <div class="apps" id="apps"></div>
+  <div class="foot" id="foot">bateria 7% · Capítulo 5 de 6</div>
+</div>
+</div></div>
+
+<script>
+var scr=document.getElementById('scr'),stack=[],cur='',openTh=-1,chatEl=null;
+function push(title,html,cls){
+  var d=document.createElement('div');d.className='appscreen';
+  d.innerHTML='<div class="topbar"><button class="back">‹</button><h2>'+title+'</h2></div><div class="'+(cls||'list')+'">'+html+'</div>';
+  d.querySelector('.back').onclick=pop;scr.appendChild(d);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('active');});});
+  stack.push(d);return d;
+}
+function pop(){var d=stack.pop();if(!d)return;if(d._th){openTh=-1;chatEl=null;}d.classList.remove('active');setTimeout(function(){d.remove();},300);}
+var unlocked={},lockCtx=null;
+function openLock(id,title,hint,password,onSuccess){
+  cur='';var k='';
+  for(var i=1;i<=9;i++)k+='<button class="key" onclick="pinTry('+i+')">'+i+'</button>';
+  k+='<button class="key x"></button><button class="key" onclick="pinTry(0)">0</button><button class="key" onclick="pinDelG()">⌫</button>';
+  lockCtx={password:password,onSuccess:onSuccess,id:id};
+  push(title,'<div style="font-size:15px">Digite a senha</div><div class="cap" style="text-align:center;padding:6px 30px 0">'+hint+'</div><div class="dots" id="dotsG"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="keys">'+k+'</div>','pinw');
+}
+function pinTry(n){
+  if(cur.length>=4)return;cur+=n;dotsG();
+  if(cur.length===4){setTimeout(function(){
+    if(cur===lockCtx.password){unlocked[lockCtx.id]=true;pop();cur='';renderApps();lockCtx.onSuccess();}
+    else{var d=document.getElementById('dotsG');d.classList.add('shake');setTimeout(function(){d.classList.remove('shake');cur='';dotsG();},400);}
+  },200);}
+}
+function pinDelG(){cur=cur.slice(0,-1);dotsG();}
+function dotsG(){var e=document.querySelectorAll('#dotsG .dot');for(var i=0;i<e.length;i++)e[i].classList.toggle('on',i<cur.length);}
+function tryOpen(id,title,hint,password,fn){ if(unlocked[id]) fn(); else openLock(id,title,hint,password,fn); }
+
+/* ===== mensagens chegando ao vivo: "digitando…" no toast e no chat ===== */
+var UNK={a:'?',c:'#333',n:'Número desconhecido',p:'',t:'',m:[],u:0,on:0};
+var NOTIFS=[
+ {th:3,a:'G',c:'#3a4a5a',n:'Gui',m:'Bella, você tá bem? Fui ao camarim e a porta estava aberta.'},
+ {th:4,a:'D',c:'#4a4a3a',n:'Duda',m:'a luz voltou e você sumiu. O público tá chamando seu nome.'},
+ {th:'u',a:'?',c:'#333',n:'Número desconhecido',m:'Você não devia ter mexido nesses arquivos.'},
+ {th:1,a:'M',c:'#5a3a3a',n:'Marcelo',m:'Bella, me atende. Não mostra nada pra ninguém antes da gente conversar.'},
+ {th:2,a:'P',c:'#4a3a4a',n:'Patrícia',m:'apaga os prints. agora. eu te peço.'},
+ {th:'u',a:'?',c:'#333',n:'Número desconhecido',m:'Alguém viu você no corredor dos fundos.'},
+ {th:5,a:'I',c:'#3a3a3a',n:'Seu Ivo',m:'Dona Bella, tem um homem de terno rondando lá fora. Não olhe pra trás.'},
+ {th:3,a:'G',c:'#3a4a5a',n:'Gui',m:'se você ler isso: NÃO confia em quem tá chorando mais alto lá embaixo.'},
+ {th:'u',a:'?',c:'#333',n:'Número desconhecido',m:'A bateria tá acabando, né? Ninguém vai achar você a tempo.'},
+ {th:4,a:'D',c:'#4a4a3a',n:'Duda',m:'achei seu celular atrás do sofá. Bella, onde você TÁ?'}
+];
+var ni=0,toastsOn=false;
+function clock(){var m=16+ni;return '23:'+(m<10?'0'+m:m);}
+function unreadTotal(){var s=0;TH.forEach(function(x){s+=x.u||0;});return s;}
+function showToast(){
+  if(!toastsOn||ni>=NOTIFS.length)return;
+  var n=NOTIFS[ni],i=n.th;ni++;
+  if(i==='u'){if(!UNK.on){UNK.on=1;TH.push(UNK);}i=TH.indexOf(UNK);}
+  var t=TH[i],live=(openTh===i&&chatEl),typ=null;
+  if(live){typ=document.createElement('div');typ.className='b t typ';typ.innerHTML='<span class="tp"><i></i><i></i><i></i></span>';chatEl.appendChild(typ);chatEl.scrollTop=1e5;}
+  var d=document.createElement('div');d.className='toast';
+  d.innerHTML='<div class="tav" style="background:'+n.c+'">'+n.a+'</div><div class="tt"><div class="tn">'+n.n+'</div><div class="tm"><span class="tp"><i></i><i></i><i></i></span> digitando</div></div>';
+  scr.appendChild(d);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('show');});});
+  setTimeout(function(){
+    t.m.push(['t',n.m]);t.p=n.m;t.t=clock();
+    d.querySelector('.tm').textContent=n.m;
+    if(live&&openTh===i){typ.className='b t';typ.textContent=n.m;chatEl.scrollTop=1e5;}
+    else{if(typ)typ.remove();t.u=(t.u||0)+1;renderApps();}
+  },2200+Math.random()*1200);
+  setTimeout(function(){d.classList.remove('show');setTimeout(function(){d.remove();},400);},6600);
+  setTimeout(showToast,14000+Math.random()*8000);
+}
+function startToasts(){ if(toastsOn)return; toastsOn=true; setTimeout(showToast,6000); }
+var bat=7;setInterval(function(){if(!toastsOn||bat<=1)return;bat--;var f=document.getElementById('foot');f.textContent='bateria '+bat+'% · Capítulo 5 de 6';if(bat<=3)f.style.color='var(--alert)';},50000);
+
+var K={t:'b t',m:'b m',T:'b t c',M:'b m c'};
+function chat(a){return a.map(function(x){
+  if(x[0]==='s')return '<div class="st">'+x[1]+'</div>';
+  return (x[2]?'<div class="who">'+x[2]+'</div>':'')+'<div class="'+K[x[0]]+'">'+x[1]+'</div>';}).join('');}
+function rows(a,fn){return a.map(function(x,i){
+  return '<div class="row" onclick="'+fn+'('+i+')"><div class="av" style="background:'+x.c+'">'+x.a+'</div><div class="m"><div class="n">'+x.n+(x.u?' <span style="color:var(--alert)">●</span>':'')+'</div><div class="p '+(x.r?'red':'')+'">'+x.p+'</div></div><div class="t">'+x.t+'</div></div>';}).join('');}
+function notes(a){return a.map(function(x){
+  return '<div class="note"><div class="nt">'+x.t+'</div><div class="nd">'+x.d+'</div><div class="nb">'+x.b+'</div></div>';}).join('');}
+function items(a){return a.map(function(x){
+  return '<div class="it"><b>'+x.b+'</b>'+(x.x?'<div class="body">'+x.x+'</div>':'')+'<div class="tm">'+x.t+'</div></div>';}).join('');}
+function photos(a,fn){return '<div class="grid">'+a.map(function(x,i){return '<div class="ph" onclick="'+fn+'('+i+')">'+x.e+'</div>';}).join('')+'</div>';}
+function photoView(x){push(x.t,'<div class="big">'+x.e+'</div><div class="cap">'+x.c+'</div>','list pv');}
+
+/* ===================== CELULAR DA BELLA ===================== */
+var TH=[
+{a:'🎸',c:'#3a2f3a',n:'Rosa Elétrica (banda)',p:'Duda: quem abriu a porta dos fundos?',t:'23:12',u:1,m:[
+ ['t','a luz do palco caiu, o que houve?','Gui'],['t','o gerador do teatro não pegou, isso nunca tinha acontecido','Marcelo'],
+ ['t','cadê a Bella? ela saiu de cena antes da luz voltar','Duda'],['t','ela foi pro camarim, deve estar voltando','Patrícia'],
+ ['t','já faz uns minutos e ela não voltou, o público tá esperando','Duda'],['t','alguém checou os fundos do teatro?','Gui'],
+ ['t','a porta dos fundos tava aberta. Quem abriu?','Duda'],['s','23:12 · 5 pessoas']]},
+{a:'M',c:'#5a3a3a',n:'Marcelo (empresário)',p:'amanhã pode ser tarde demais',t:'21:40',m:[
+ ['t','Precisamos falar sobre os cachês antes de subir ao palco hoje.'],
+ ['m','É sobre os royalties do álbum? Notei uma diferença no extrato.'],
+ ['T','Guarda essa conversa pra depois do show, Bella. Hoje é uma noite importante demais.'],
+ ['m','Marcelo, isso é dinheiro da banda inteira, não só meu.'],
+ ['T','Eu sei. Confia em mim, amanhã eu te mostro tudo direitinho.'],
+ ['m','Tá bem. Mas quero as contas certas amanhã cedo.'],
+ ['T','Amanhã pode ser tarde demais pra certas perguntas.'],
+ ['s','21:40 · lida']]},
+{a:'P',c:'#4a3a4a',n:'Patrícia (contadora)',p:'algumas planilhas é melhor ninguém abrir',t:'20:15',m:[
+ ['t','Bella, sobre a planilha que você pediu: melhor deixar isso pra depois do lançamento de hoje.'],
+ ['m','Por que tanto mistério com uma planilha, Patrícia?'],
+ ['T','Não é mistério, é organização. Hoje é noite de comemorar, não de brigar por número.'],
+ ['m','Você e o Marcelo estão estranhos essa semana.'],
+ ['t','Imaginação sua. Bom show hoje!'],
+ ['T','Algumas planilhas é melhor ninguém abrir. Confia em mim.'],
+ ['s','20:15 · lida']]},
+{a:'G',c:'#3a4a5a',n:'Gui (baixista/namorado)',p:'não fala nada até eu te mostrar uma coisa',t:'22:50',m:[
+ ['t','Preciso te mostrar uma coisa antes de você subir ao palco, é sério.'],
+ ['m','Fala rápido, entro em cena em 15 minutos.'],
+ ['T','Os valores de royalties que aparecem no nosso contrato não batem com o que o selo realmente pagou. Faltam quase 70 mil.'],
+ ['m','Isso não pode ser verdade.'],
+ ['T','Não fala nada até eu te mostrar os prints direito. Te encontro no camarim assim que puder.'],
+ ['m','Tá bem, assim que a luz do intervalo passar eu vou até lá.'],
+ ['T','Não comenta com ninguém. Nem com quem parece estar do seu lado.'],
+ ['s','22:50 · entregue']]},
+{a:'D',c:'#4a4a3a',n:'Duda (baterista)',p:'lembra os 9 anos de banda, 20 de maio?',t:'19:30',m:[
+ ['t','Hoje vai ser inesquecível, sinto isso!'],
+ ['m','Espero que sim, esse álbum é o nosso maior sonho.'],
+ ['t','Lembra os 9 anos de banda? 20 de maio, começamos tocando de graça num bar vazio.'],
+ ['m','Nunca esqueço essa data. Foi o início de tudo isso.'],
+ ['t','Bom show, amiga. Você merece cada segundo desse palco.'],
+ ['s','19:30 · lida']]},
+{a:'I',c:'#3a3a3a',n:'Seu Ivo (segurança do camarim)',p:'deixei a porta dos fundos destrancada',t:'23:11',m:[
+ ['t','Dona Bella, a senhora está bem? Ouvi um barulho estranho aqui.'],
+ ['T','Vi o Marcelo saindo correndo pelo corredor, sozinho, uns minutos atrás.'],
+ ['t','O camarim sete continua aberto, como a senhora pediu. Ninguém entrou.'],
+ ['t','Deixei a porta dos fundos destrancada, caso a senhora precise sair sem ser vista.'],
+ ['T','Um homem de terno escuro perguntou pela senhora no estacionamento. Não deu o nome.'],
+ ['s','23:11 · entregue']]}
+];
+function openTH(i){var t=TH[i];t.u=0;renderApps();var d=push(t.n,chat(t.m),'chat');d._th=1;openTh=i;chatEl=d.lastChild;chatEl.scrollTop=1e5;}
+
+var PH=[
+{e:'📊',t:'21:00',c:'Print do contrato de royalties. <b>O valor pago pelo selo é R$ 70 mil menor</b> do que o combinado originalmente.'},
+{e:'🎰',t:'20:30',c:'Print de mensagens de cobrança de uma "consultoria de investimentos" endereçadas ao Marcelo.'},
+{e:'🖥️',t:'22:20',c:'Foto tremida do escritório da produção. <b>Patrícia copiando contratos pra um pen drive</b>, sem perceber a câmera aberta.'},
+{e:'📄',t:'21:10',c:'Print de um contrato antigo com o "Selo Máxima" e o nome de Fábio Andrade como diretor responsável.'},
+{e:'🪜',t:'23:13',c:'Corredor dos fundos do teatro, foto escura. <b>Uma silhueta saindo às pressas</b>, minutos após o apagão.'},
+{e:'🎤',t:'20/05',c:'Foto do primeiro show da banda, num bar quase vazio. Legenda: <b>«começamos aqui, olha até onde chegamos»</b>.'},
+{e:'🐈',t:'antiga',c:'Foto do gato dela, Prince, com um chapéu de festa. Legenda: <b>«o rei da casa faz aniversário no fim do ano»</b>.'},
+{e:'🏢',t:'antiga',c:'Foto de uma placa na entrada do selo: <b>«Selo Máxima — fundado em 2011»</b>.'},
+{e:'📱',t:'22:40',c:'Print de conversa apagada entre Marcelo e alguém salvo como «Fábio Andrade (NÃO FALAR NA FRENTE DELA)».'},
+{e:'💿',t:'agosto',c:'Contracapa do álbum "Rosa Elétrica" pronta pra gráfica. Lista de músicas: <b>doze faixas</b>, da primeira à última. Anotado a caneta ao lado: <b>«a nº 1 eu escrevo no camarim, sozinha»</b>.'}
+];
+function openPH(i){photoView(PH[i]);}
+
+var NT=[
+{t:'os royalties não fecham',d:'ontem',b:'faltam quase 70 mil no que o selo pagou pela turnê\no Marcelo desconversa toda vez que eu pergunto\nvou confrontar ele direito hoje, antes ou depois do show'},
+{t:'senha do Insta (perfil real)',d:'mês passado',b:'é aquele perfil que só uso pra desabafar\nsenha = dia e mês do aniversário de quem me espera em casa\nnem minha equipe segue esse perfil'},
+{t:'Marcelo e as senhas dele',d:'faz tempo',b:'ele sempre usa o ano em que fechou o primeiro contrato grande\nele repete isso em toda entrevista, com muito orgulho\n(2015? 2016? tenho que confirmar)'},
+{t:'quem ganha com isso',d:'hoje',b:'1. Marcelo: cobre um rombo antes que alguém descubra\n2. Patrícia: protege o Marcelo, mas por quê?\n3. quem é esse "Fábio Andrade"?'},
+{t:'plano pro intervalo',d:'hoje, 22:45',b:'vou até o camarim falar com o Gui\nse for verdade, confronto o Marcelo ainda hoje, no palco se precisar\nnão vou deixar o nome da banda ser usado assim'}
+];
+
+var IGM=[
+ ['t','Vi sua mensagem, o que você descobriu sobre os royalties?','Gui'],
+ ['m','40% do que aparece no contrato não bate com o extrato real do selo.'],
+ ['T','Eu suspeitava. Vi o Marcelo mexendo numa "consultoria" estranha semana passada.','Gui'],
+ ['m','Vou confrontar ele hoje, com ou sem plateia.'],
+ ['T','Cuidado. Troquei minha senha do trabalho pro dia e mês em que vi o primeiro número errado nos contratos. Foi no começo de setembro, faz as contas.','Gui'],
+ ['m','Vou anotar isso em algum lugar seguro.'],
+ ['t','Bom show. Você é mais forte do que imagina.','Gui']
+];
+function openIG(){push('Instagram · @bella.de.verdade (privado)',chat(IGM),'chat');}
+
+var CH=[
+{b:'Contrato da turnê',x:'Royalties combinados: R$ 220 mil pela turnê completa, divididos entre os 4 integrantes.',t:'início do ano'},
+{b:'Extrato real do selo',x:'Valor repassado até agora é R$ 70 mil menor do que o combinado em contrato.',t:'hoje'},
+{b:'Transferência suspeita',x:'Uma saída de R$ 40 mil na 2ª semana de agosto, categorizada como «taxas de produção», sem nota fiscal. Dia 11.',t:'agosto'},
+{b:'Lembrete pra mim mesma',x:'A senha do e-mail institucional é o dia e o mês dessa transferência. Não posso esquecer.',t:'agosto'},
+{b:'Anotação da Patrícia (print)',x:'«resolver com o Fábio antes do fechamento do trimestre, em novembro, ou o rombo aparece na auditoria do selo»',t:'outubro'}
+];
+function openCH(){push('Cachês — painel de royalties',items(CH));}
+
+var EM=[
+{b:'Selo Máxima: confirmação do show',x:'Tudo certo para o lançamento de hoje. Boa sorte à banda.',t:'hoje, 09:00'},
+{b:'Marcelo: sobre os números',x:'Vamos alinhar o discurso antes do show de hoje. Me chama.',t:'hoje, 14:00'},
+{b:'Patrícia: confidencial',x:'O que conversamos ontem fica entre nós até resolvermos com o Fábio.',t:'ontem, 20:00'},
+{b:'Rascunho: pra denunciar',x:'«Como um selo de música pode estar escondendo um rombo de 70 mil»',t:'rascunho'},
+{b:'Lembrete pra mim mesma',x:'A senha da galeria é o aniversário do nosso primeiro álbum, o dia em que o disco nasceu. Abril. Cinco.',t:'quinta'}
+];
+
+var AG=[
+{b:'Show de lançamento',x:'21h às 23h30, Teatro Vega.',t:'hoje'},
+{b:'Conversa com o Gui',x:'22h50, camarim, assim que o intervalo passar.',t:'hoje'},
+{b:'Reunião com o Selo Máxima',x:'Marcada pra semana que vem, adiada duas vezes pelo Marcelo.',t:'próxima semana'},
+{b:'Fechamento do trimestre',x:'Novembro. Anotação: «se o rombo não for coberto até lá, aparece na auditoria do selo».',t:'novembro'},
+{b:'Prazo do Fábio',x:'Anotação num post-it: «resolve isso até o dia marcado, ou eu resolvo do meu jeito».',t:'?'}
+];
+
+var GR=[
+{b:'Gravador 1',x:'Transcrição: «...se isso aparecer na auditoria, a culpa cai toda em cima de você, não minha...» (voz de Fábio Andrade, ao telefone, ouvida sem querer)',t:'terça'},
+{b:'Gravador 2',x:'Transcrição: «Patrícia, eu preciso resolver isso antes do show de hoje, não dá mais pra esperar.» (voz de Marcelo)',t:'hoje, 19:00'},
+{b:'Gravador 3',x:'Transcrição: passos apressados no corredor, uma porta batendo, depois só o som da plateia ao fundo.',t:'hoje, 23:11'},
+{b:'Gravador 4 (oculto)',x:'Transcrição: «...a transferência final pro Fábio sai dia 10, sem falta, antes do fechamento...» (voz de Marcelo, ao telefone)',t:'hoje, 20:20'}
+];
+
+var SA=[
+{b:'Passos',x:'De 23:05 a 23:13: 290 passos, do palco até o camarim e depois até o corredor dos fundos.',t:'hoje'},
+{b:'Batimentos',x:'Pico de 150 bpm às 23:11. Cai pra 96 bpm às 23:15, como se o perigo tivesse ficado pra trás.',t:'hoje'},
+{b:'Última atividade',x:'23:11: celular parado atrás do sofá do camarim até ser encontrado pela Duda às 23:30.',t:'hoje'}
+];
+
+var LO=[
+{b:'21:00',x:'Palco principal (abertura do show)',t:'hoje'},
+{b:'21:50',x:'Sala da Patrícia, 6 minutos',t:'hoje'},
+{b:'22:50',x:'Camarim, com o Gui',t:'hoje'},
+{b:'23:08',x:'Quadro de luz, no corredor técnico',t:'hoje'},
+{b:'23:13',x:'Corredor dos fundos. Depois disso o celular não se move mais.',t:'hoje'},
+{b:'23:30',x:'Celular encontrado pela Duda, atrás do sofá do camarim',t:'hoje'}
+];
+
+var SO=[
+{b:'Marcelo',x:'apagou um story às 22:40: «hoje precisa dar tudo certo»',t:'hoje'},
+{b:'Patrícia',x:'postou nos stories: «show incrível, parabéns banda!» às 23:00, antes mesmo do show terminar',t:'hoje'},
+{b:'Gui',x:'comentou numa foto antiga sua: «cuidado com quem te cerca hoje»',t:'hoje, 22:45'},
+{b:'Perfil «fabio_selomaxima»',x:'começou a seguir o Marcelo essa semana, sem foto de perfil recente',t:'quarta'}
+];
+
+var CF=[
+{b:'Quem é o Fábio Andrade',x:'Dono do Selo Máxima, investiu pesado no álbum novo e cobra retorno rápido, ameaçando expor publicamente qualquer atraso nos números.',t:'—'},
+{b:'O rombo real',x:'Marcelo usou parte dos royalties da banda numa "consultoria de investimentos" que prometia dobrar o dinheiro rápido, indicada pelo próprio Fábio. Perdeu tudo.',t:'—'},
+{b:'Por que a Patrícia ajudou',x:'Documentos mostram que ela também investiu dinheiro próprio no mesmo esquema, por indicação do Marcelo, e perdeu tudo junto com ele.',t:'—'},
+{b:'Pra onde a Bella foi',x:'Ela saiu pela porta dos fundos que o Seu Ivo deixou destrancada e foi direto pro apartamento da Duda, com prints e gravações suficientes pra expor tudo com segurança.',t:'—'}
+];
+function openCF(){push('Nuvem — backup automático',items(CF));}
+
+/* ===================== CADERNO (livro com páginas) ===================== */
+var BK=[
+{t:'Caderno de letras · Bella D.',b:'Se achou, devolve.\nSe leu, guarda segredo.\n\nvire a página →'},
+{t:'Corda bamba',b:'Acendo a luz, o palco é meu,\nmas a sombra atrás de mim cresceu.\nSe a corda arrebenta no meio do som,\nquem segura minha mão? Ninguém tem o dom.'},
+{t:'Extrato',b:'Cada número que o papel me diz\ntem cara de sorriso e voz de giz.\nSe a conta cresce e o dinheiro some,\nalguém aqui tá me chamando pelo nome.'},
+{t:'Letra sem título',b:'Na placa velha, a tinta a descascar,\no ano em que o selo veio ao mundo pra mandar:\ndois mil e onze, e desde então\nquem manda escreve o preço em minha mão.'},
+{t:'Se algo acontecer comigo',b:'A prova toda está guardada na nuvem.\nA chave são dois pedaços:\no dia que o Fábio marcou pra fechar a conta,\ne o mês em que a conta cai na auditoria.\n\nNão confie em quem sorri demais.'},
+{t:'Hoje',b:'Hoje eu subo lá e canto\ncom a garganta cheia de verdade.\nSe as luzes se apagarem antes da última nota,\n\n[o resto da página foi arrancado]'}
+];
+var bi=0;
+function bookGo(n,dir){
+  if(n<0||n>=BK.length)return;bi=n;
+  var p=document.getElementById('pg');p.className='pg';p.offsetWidth;p.className='pg '+(dir<0?'fl':'fr');
+  p.innerHTML='<div class="pt">'+BK[n].t+'</div><div class="pb">'+BK[n].b+'</div>';
+  document.getElementById('pn').textContent=(n+1)+' / '+BK.length;
+}
+function openBook(){
+  push('Caderno de letras','<div class="bk"><div class="pg" id="pg"></div><div class="nav"><button class="btn" onclick="bookGo(bi-1,-1)">‹</button><span id="pn"></span><button class="btn" onclick="bookGo(bi+1,1)">›</button></div></div>','list');
+  bookGo(0,1);
+}
+
+/* ===================== CELULAR DO MARCELO ===================== */
+var VM=[
+ ['s','duas semanas atrás'],['t','Se isso não for resolvido logo, vai aparecer na auditoria do selo.','Fábio Andrade'],
+ ['m','Vou repor o quanto antes, só preciso de mais um pouco de tempo.'],['T','Não tenho paciência infinita.','Fábio Andrade'],
+ ['s','hoje, 19:05'],['T','Patrícia, preciso resolver isso antes do show de hoje.','eu → Patrícia'],['M','Tá bem, mas essa é a última vez que eu maquio um relatório pra você.','Patrícia'],
+ ['t','Prometo. Depois do show eu conto tudo pra Bella com calma.'],
+ ['s','22:55'],['M','A Bella descobriu. Ela foi falar com o Gui.'],['T','Vai atrás dela. Não deixa isso estourar no meio do show.','Patrícia']
+];
+var VN=[
+{t:'o investimento com o Fábio',d:'2 meses atrás',b:'Perdi muito mais do que imaginava numa jogada que parecia segura.\nA Patrícia topou ajudar a esconder, mas ela também perdeu dinheiro nisso.'},
+{t:'senha de tudo',d:'faz tempo',b:'Uso sempre o ano que fechei meu primeiro contrato grande.\nFalo isso em toda entrevista, sem imaginar que um dia seria problema.'},
+{t:'contar pra Bella?',d:'hoje, 22:50',b:'Eu não queria que ela descobrisse assim, na noite mais importante da carreira dela.\nSe ela me demitir, eu mereço.\nMas juro que nunca deixaria ninguém fazer mal a ela.'}
+];
+var VE=[
+{b:'Fábio Andrade: prazo final',x:'Dia 10. Sem mais prorrogação. Você sabe o que acontece com quem me deve.',t:'segunda'},
+{b:'Patrícia: sem provas',x:'Apague qualquer conversa sobre o investimento. Isso não pode aparecer em lugar nenhum.',t:'quinta'}
+];
+var VG=[
+{b:'Áudio de Patrícia (encaminhado)',x:'«Depois que o Fábio receber, ninguém mais vai mexer nisso. Foca no show e relaxa.»',t:'quinta'}
+];
+var VP=[{e:'📸',t:'terça',c:'Print do extrato mostrando a transferência de 40 mil pro Fábio, escondida numa conta que não é a da banda.'}];
+function openPin(){ openLock('mar','Celular do Marcelo','quatro números. Um ano de que ele se orgulha. A Bella anotou onde?','2015', vhome); }
+function vhome(){
+  push('Celular do Marcelo','<div class="apps" style="padding:14px 18px">'+
+  [['💬','Mensagens','vmsg'],['📝','Notas','vnote'],['✉️','E-mail','vmail'],['🎙️','Gravador','vrec'],['🖼️','Fotos','vpic']].map(function(x){
+   return '<button class="app" onclick="'+x[2]+'()"><div class="icon">'+x[0]+'</div><span class="l">'+x[1]+'</span></button>';}).join('')+'</div>');
+}
+function vmsg(){push('Fábio / Patrícia',chat(VM),'chat');}
+function vnote(){push('Notas',notes(VN));}
+function vmail(){push('E-mail',items(VE));}
+function vrec(){push('Gravador',items(VG));}
+function vpic(){push('Fotos','<div class="grid"><div class="ph" onclick="photoView(VP[0])">📸</div></div>');}
+
+/* ===================== SOLUÇÃO ===================== */
+function openSol(){
+  push('Solução','<div class="cap" style="padding:16px" id="sw">Só toque quando todo mundo já tiver votado. Não tem volta.<br><br><button class="btn" onclick="document.getElementById(\'st\').style.display=\'block\';document.getElementById(\'sw\').style.display=\'none\'">revelar solução</button></div>'+
+  '<div id="st" class="cap" style="display:none;padding:16px;line-height:1.7"><b>Vilões diretos: Marcelo e Patrícia.</b><br><br>Marcelo investiu parte dos royalties da banda num esquema indicado por Fábio Andrade, dono do Selo Máxima, e perdeu R$ 70 mil. Desesperado, pediu ajuda a Patrícia, que maquiou os relatórios financeiros pra esconder o rombo. Quando Bella descobriu na noite do lançamento, os dois tentaram convencê-la a esperar.<br><br><b>Inocentes:</b> Gui (avisou Bella a tempo), Duda (só queria ver o show dar certo) e Seu Ivo (ajudou deixando a porta destrancada).<br><br><b>Final:</b> ninguém machucou a Bella. Ela saiu pela porta dos fundos e foi direto pro apartamento da Duda, com provas suficientes pra expor tudo com segurança.<br><br><b>Mandante por trás de tudo:</b> Fábio Andrade, que indicou o investimento e pressionou Marcelo a repor o valor pra não manchar o nome do selo.<br><br><b>Cadeia de senhas:</b> Notas 2005 (20/05, Duda) → Insta 0812 (aniversário do gato, 8/12) → Cachês 1709 (Gui: 17/09) → E-mail 1108 (transferência de 11/08) → Galeria 0504 → Caderno 1207 (12 faixas + camarim 7) → Gravador 2011 (letra do caderno) → Nuvem 1011 (dia 10 do Gravador + mês 11, novembro) → Celular do Marcelo 2015.</div>');
+}
+
+/* ===================== HOME ===================== */
+var APP=[
+ ['💬','Mensagens',function(){push('Mensagens',rows(TH.map(function(x){return {a:x.a,c:x.c,n:x.n,p:x.p,t:x.t,u:x.u};}),'openTH'));},0],
+ ['📝','Notas',function(){tryOpen('notas','Notas','quatro números. Um bar vazio, uma data que a baterista jamais esquece. Dia e mês, colados.','2005',function(){push('Notas',notes(NT));});},2,'notas'],
+ ['📷','Instagram',function(){tryOpen('insta','Instagram','quatro números. Alguém de quatro patas comemora no fim do ano. Está numa foto e numa anotação.','0812',openIG);},0,'insta'],
+ ['🎵','Cachês',function(){tryOpen('cach','Cachês','quatro números. Quem te ouve de perto contou quando o primeiro número falhou.','1709',openCH);},0,'cach'],
+ ['✉️','E-mail',function(){tryOpen('email','E-mail','quatro números. O dia de uma saída de dinheiro sem nota. Está nos números, não nas palavras.','1108',function(){push('E-mail',items(EM));});},5,'email'],
+ ['🖼️','Galeria',function(){tryOpen('galeria','Galeria','quatro números. Ela escreveu um lembrete a si mesma sobre o dia em que um disco nasceu.','0504',function(){push('Galeria',photos(PH,'openPH'));});},0,'galeria'],
+ ['📖','Caderno',function(){tryOpen('livro','Caderno de letras','quatro números. O tamanho do disco, depois a porta onde ela se escondia antes de subir ao palco.','1207',openBook);},0,'livro'],
+ ['📞','Ligações',function(){push('Ligações',rows([
+   {a:'G',c:'#3a4a5a',n:'Gui',p:'recebida · 5 min',t:'22:50'},
+   {a:'M',c:'#5a3a3a',n:'Marcelo',p:'perdida',r:1,t:'21:45'},
+   {a:'P',c:'#4a3a4a',n:'Patrícia',p:'feita · 2 min',t:'20:17'},
+   {a:'I',c:'#3a3a3a',n:'Seu Ivo',p:'recebida · 0:15',t:'23:11'},
+   {a:'?',c:'#333',n:'Número desconhecido',p:'perdida',r:1,t:'23:16'}
+ ],'void'));}],
+ ['🔔','Redes',function(){push('Redes',items(SO));},3],
+ ['📅','Agenda',function(){push('Agenda',items(AG));}],
+ ['🎙️','Gravador',function(){tryOpen('grav','Gravador','quatro números. Um ano. A resposta está escrita à mão, em outro lugar do celular dela.','2011',function(){push('Gravador',items(GR));});},4,'grav'],
+ ['❤️','Saúde',function(){push('Saúde',items(SA));}],
+ ['📍','Localização',function(){push('Localização',items(LO));}],
+ ['☁️','Nuvem',function(){tryOpen('nuvem','Nuvem','quatro números. Dois pedaços: o dia que alguém marcou numa gravação e o mês do fechamento.','1011',openCF);},0,'nuvem'],
+ ['🔒','Celular do Marcelo',openPin],
+ ['🔍','Solução',openSol]
+];
+function renderApps(){
+  var c=document.getElementById('apps');c.innerHTML='';
+  APP.forEach(function(a){
+    var locked=a[4]&&!unlocked[a[4]],cnt=a[1]==='Mensagens'?unreadTotal():a[3];
+    var b=document.createElement('button');b.className='app';
+    var badge=locked?'<span class="badge" style="background:#555">🔒</span>':(cnt?'<span class="badge">'+cnt+'</span>':'');
+    b.innerHTML='<div class="icon">'+a[0]+badge+'</div><span class="l">'+a[1]+'</span>';
+    b.onclick=a[2];c.appendChild(b);
+  });
+}
+renderApps();
+</script>
+</body>
+</html>
