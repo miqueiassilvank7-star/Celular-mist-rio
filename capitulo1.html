@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O Celular da Helena</title>
+<style>
+:root{
+  --bg:#0d1416; --ink:#e9efee; --dim:#8a9a9a; --panel:#152024; --panel2:#1d2b30;
+  --accent:#7fd1c7; --accent-dim:#3f7f78; --alert:#d1665a; --me:#24524d; --them:#1f2d33;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{margin:0;min-height:100%;background:radial-gradient(ellipse at top,#16242a 0%,#070b0c 70%);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);padding:24px 12px;}
+.frame{width:100%;max-width:380px;height:800px;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.7),inset 0 0 0 2px #2a2a2a;}
+.screen{width:100%;height:100%;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column;}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:60;}
+.lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:70px;background:linear-gradient(170deg,#1b3038 0%,#0d1416 65%);z-index:50;transition:transform .35s ease;}
+.lock.hidden{transform:translateY(-100%);}
+.lock .time{font-size:58px;font-weight:600;letter-spacing:-1px;}
+.lock .date{font-size:15px;color:var(--dim);margin-top:4px;}
+.lock .warn{margin-top:26px;background:rgba(255,255,255,.07);border-radius:14px;padding:10px 14px;font-size:12px;color:var(--dim);width:82%;line-height:1.5;}
+.lock .hint{margin-top:auto;margin-bottom:30px;font-size:12.5px;color:var(--dim);text-align:center;padding:0 30px;}
+.btn{padding:13px 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:20px;color:var(--ink);font-size:14px;cursor:pointer;font-family:inherit;}
+.home{flex:1;display:flex;flex-direction:column;padding:46px 18px 14px;overflow-y:auto;}
+.status{font-size:12px;color:var(--dim);text-align:center;}
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;margin-top:18px;}
+.app{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;color:var(--ink);font-family:inherit;cursor:pointer;}
+.icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;background:var(--panel2);}
+.badge{position:absolute;top:-4px;right:-4px;background:var(--alert);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.app span.l{font-size:10.5px;color:var(--dim);text-align:center;}
+.foot{margin-top:auto;text-align:center;font-size:11px;color:var(--dim);padding-top:14px;}
+.appscreen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;z-index:30;}
+.appscreen.active{transform:translateX(0);}
+.topbar{display:flex;align-items:center;gap:10px;padding:52px 16px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:var(--panel);flex-shrink:0;}
+.back{background:none;border:none;color:var(--accent);font-size:20px;padding:0 8px 0 0;cursor:pointer;}
+.topbar h2{font-size:16px;margin:0;font-weight:600;}
+.list{flex:1;overflow-y:auto;padding:8px 0;}
+.list::-webkit-scrollbar,.chat::-webkit-scrollbar{display:none;}
+.row{display:flex;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}
+.av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
+.row .m{flex:1;min-width:0;}
+.row .n{font-size:13.5px;font-weight:600;}
+.row .p{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .p.red{color:var(--alert);}
+.row .t{font-size:10.5px;color:var(--dim);align-self:flex-start;}
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;}
+.b{max-width:80%;padding:8px 12px;border-radius:16px;font-size:13px;line-height:1.4;}
+.b.t{align-self:flex-start;background:var(--them);border-bottom-left-radius:4px;}
+.b.m{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px;}
+.b.c{box-shadow:0 0 0 1px var(--accent-dim);}
+.st{font-size:9.5px;color:var(--dim);text-align:center;margin:4px 0;}
+.who{font-size:10.5px;color:var(--accent);margin-bottom:-4px;margin-left:2px;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;}
+.ph{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--panel2);cursor:pointer;}
+.pv{padding:16px;}
+.big{width:100%;aspect-ratio:4/5;background:var(--panel2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:14px;}
+.cap{font-size:12.5px;color:var(--dim);line-height:1.6;}
+.cap b{color:var(--ink);}
+.note{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.note .nt{font-size:13.5px;font-weight:600;margin-bottom:3px;}
+.note .nd{font-size:10.5px;color:var(--dim);margin-bottom:7px;}
+.note .nb{font-size:12.5px;color:#cfdad9;line-height:1.6;white-space:pre-line;}
+.note.lk .nb{filter:blur(5px);user-select:none;transition:filter .25s;}
+.note.lk.open .nb{filter:none;}
+.tip{font-size:11px;color:var(--accent);margin-top:6px;}
+.it{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px;line-height:1.55;}
+.it b{color:var(--accent);}
+.it .tm{font-size:10.5px;color:var(--dim);margin-top:4px;}
+.it .body{margin-top:6px;color:#cfdad9;}
+.pinw{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:40px;}
+.dots{display:flex;gap:14px;margin:18px 0 26px;}
+.dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--dim);}
+.dot.on{background:var(--accent);border-color:var(--accent);}
+.keys{display:grid;grid-template-columns:repeat(3,70px);gap:14px;}
+.key{height:60px;border-radius:50%;background:var(--panel2);border:none;color:var(--ink);font-size:22px;font-family:inherit;cursor:pointer;}
+.key.x{background:none;cursor:default;}
+.shake{animation:sh .35s;}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
+</head>
+<body>
+<div class="frame"><div class="screen" id="scr">
+<div class="notch"></div>
+<div class="lock" id="lock">
+  <div class="time">22:13</div>
+  <div class="date">sexta-feira, 20 de setembro</div>
+  <div class="warn">⚡ Sem energia na casa do lago desde 21:50. Tempestade forte. Estrada alagada.</div>
+  <div class="hint">celular encontrado molhado na casa de barcos, 22:41. Sem senha: ela nunca trancava.</div>
+  <button class="btn" onclick="document.getElementById('lock').classList.add('hidden')">desbloquear ↑</button>
+</div>
+<div class="home">
+  <div class="status">Helena Braga, 29, jornalista · desaparecida desde as 22:12</div>
+  <div class="apps" id="apps"></div>
+  <div class="foot">bateria 4% · sinal fraco</div>
+</div>
+</div></div>
+
+<script>
+var scr=document.getElementById('scr'),stack=[],cur='';
+function push(title,html,cls){
+  var d=document.createElement('div');d.className='appscreen';
+  d.innerHTML='<div class="topbar"><button class="back">‹</button><h2>'+title+'</h2></div><div class="'+(cls||'list')+'">'+html+'</div>';
+  d.querySelector('.back').onclick=pop;scr.appendChild(d);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('active');});});
+  stack.push(d);return d;
+}
+function pop(){var d=stack.pop();if(!d)return;d.classList.remove('active');setTimeout(function(){d.remove();},300);}
+var unlocked={},lockCtx=null;
+function openLock(id,title,hint,password,onSuccess){
+  cur='';var k='';
+  for(var i=1;i<=9;i++)k+='<button class="key" onclick="pinTry('+i+')">'+i+'</button>';
+  k+='<button class="key x"></button><button class="key" onclick="pinTry(0)">0</button><button class="key" onclick="pinDelG()">⌫</button>';
+  lockCtx={password:password,onSuccess:onSuccess,id:id};
+  push(title,'<div style="font-size:15px">Digite a senha</div><div class="cap" style="text-align:center;padding:6px 30px 0">'+hint+'</div><div class="dots" id="dotsG"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="keys">'+k+'</div>','pinw');
+}
+function pinTry(n){
+  if(cur.length>=4)return;cur+=n;dotsG();
+  if(cur.length===4){setTimeout(function(){
+    if(cur===lockCtx.password){unlocked[lockCtx.id]=true;pop();cur='';renderApps();lockCtx.onSuccess();}
+    else{var d=document.getElementById('dotsG');d.classList.add('shake');setTimeout(function(){d.classList.remove('shake');cur='';dotsG();},400);}
+  },200);}
+}
+function pinDelG(){cur=cur.slice(0,-1);dotsG();}
+function dotsG(){var e=document.querySelectorAll('#dotsG .dot');for(var i=0;i<e.length;i++)e[i].classList.toggle('on',i<cur.length);}
+function tryOpen(id,title,hint,password,fn){ if(unlocked[id]) fn(); else openLock(id,title,hint,password,fn); }
+var K={t:'b t',m:'b m',T:'b t c',M:'b m c'};
+function chat(a){return a.map(function(x){
+  if(x[0]==='s')return '<div class="st">'+x[1]+'</div>';
+  return (x[2]?'<div class="who">'+x[2]+'</div>':'')+'<div class="'+K[x[0]]+'">'+x[1]+'</div>';}).join('');}
+function rows(a,fn){return a.map(function(x,i){
+  return '<div class="row" onclick="'+fn+'('+i+')"><div class="av" style="background:'+x.c+'">'+x.a+'</div><div class="m"><div class="n">'+x.n+'</div><div class="p '+(x.r?'red':'')+'">'+x.p+'</div></div><div class="t">'+x.t+'</div></div>';}).join('');}
+function notes(a){return a.map(function(x){
+  return '<div class="note'+(x.l?' lk" onclick="this.classList.toggle(\'open\')':'')+'"><div class="nt">'+(x.l?'🔒 ':'')+x.t+'</div><div class="nd">'+x.d+'</div><div class="nb">'+x.b+'</div>'+(x.l?'<div class="tip">toque pra revelar</div>':'')+'</div>';}).join('');}
+function items(a){return a.map(function(x){
+  return '<div class="it"><b>'+x.b+'</b>'+(x.x?'<div class="body">'+x.x+'</div>':'')+'<div class="tm">'+x.t+'</div></div>';}).join('');}
+function photos(a,fn){return '<div class="grid">'+a.map(function(x,i){return '<div class="ph" onclick="'+fn+'('+i+')">'+x.e+'</div>';}).join('')+'</div>';}
+function photoView(x){push(x.t,'<div class="big">'+x.e+'</div><div class="cap">'+x.c+'</div>','list pv');}
+
+/* ===================== CELULAR DA HELENA ===================== */
+var TH=[
+{a:'🏡',c:'#3a4a4a',n:'Fim de semana no Lago',p:'Marta: ninguém sai depois das 21h',t:'21:45',m:[
+ ['t','Cheguei! A estrada tá horrível, mas o lago tá lindo','Miqueias'],['t','Vou deixar o jantar às 19h30, pontualidade!','Marta'],
+ ['m','Vovô está bem? Quero vê-lo depois do jantar'],['t','Ele dorme cedo, querida. Amanhã.','Marta'],
+ ['t','Falta luz, gente?? tudo apagou','Sophia'],['T','Ninguém sai da casa depois das 21h. A estrada alagou e o lago está perigoso.','Marta'],['t','Fica tranquila, eu cuido do gerador','Vinícius'],['s','21:45 · 5 pessoas']]},
+{a:'M',c:'#6a3a4a',n:'Tia Marta',p:'deixe a papelada comigo, querida',t:'18:20',m:[
+ ['s','quinta-feira'],['t','O vovô não pode se estressar. Deixe a papelada da fundação comigo.'],['m','Só quero ver os documentos, tia. É trabalho.'],
+ ['T','Você sempre foi curiosa demais. Isso ainda vai te custar caro.'],['m','É uma ameaça?'],['t','É um conselho. Vamos aproveitar o fim de semana em família.'],['t','Sabe que dia é hoje? 15 de abril, o dia que a vovó Elisa se foi. Você nunca esquece essa data, não é?'],['s','18:20 · lida']]},
+{a:'V',c:'#3a5a7a',n:'Vinícius',p:'conversamos em qualquer lugar menos na sala',t:'21:58',m:[
+ ['t','Helena, preciso conversar antes de você publicar qualquer coisa.'],['m','Sobre o laudo do vovô?'],['T','Não é o que você está pensando. Pelo bem dele, espera.'],
+ ['m','Você assinou aquele papel, Vini.'],['t','Eu posso explicar tudo. Só não na sala, tem gente ouvindo.'],['m','Então onde?'],['T','Eu te aviso. Confia em mim uma última vez.'],['s','21:58 · entregue']]},
+{a:'M',c:'#7a5a3a',n:'Miqueias (editor)',p:'ou você publica ou eu publico',t:'20:10',m:[
+ ['t','A fonte confirmou. O prazo é segunda 8h.'],['m','Preciso de mais provas, Miqueias.'],['T','Ou você publica segunda, ou eu publico no seu lugar. Isso é um furo enorme.'],
+ ['m','Não vou queimar meu nome com prova frágil.'],['t','Então prepare-se pra perder a matéria. A escolha é sua.'],['s','20:10 · lida']]},
+{a:'S',c:'#5a6a3a',n:'Sophia (estagiária)',p:'deixei o pen drive no lugar combinado',t:'21:20',m:[
+ ['t','Helena, deixei o pen drive no lugar combinado.'],['m','Obrigada. Ninguém sabe que foi você?'],['T','Ninguém. Mas eu achei uma coisa no notebook do Vinícius.'],
+ ['t','A senha do celular dele deve ser o dia do pedido de casamento de vocês. Ele é previsível demais.'],['m','Nem lembro direito a data...'],['t','Vc tem foto do anel, procura. Agora apaga essa conversa!'],['s','21:20 · lida']]},
+{a:'A',c:'#4a5a5a',n:'Seu Anselmo (caseiro)',p:'deixo o barco solto na doca',t:'21:52',m:[
+ ['t','Dona Helena, a senhora não me viu, mas a Marta anda mexendo no cofre do seu Alberto.'],['T','Tem carro estranho no portão desde ontem. Placa de empresa.'],
+ ['m','Obrigada, Anselmo. Estou juntando provas.'],['T','Esta noite deixo o barco solto na doca. Se precisar sumir, a senhora sabe onde eu guardo as redes.'],['s','21:52 · entregue']]},
+{a:'⚖',c:'#5a4a6a',n:'Cartório Ferraz',p:'firma reconhecida sem comparecimento',t:'17:00',m:[
+ ['t','Sra. Helena, sobre sua consulta: consta reconhecimento de firma do Sr. Alberto Braga em 12/09.'],['T','Porém o cartório não tem registro de comparecimento presencial. Pode ter sido feito por terceiros.'],['m','Dá pra emitir um comprovante disso?'],['t','Segunda-feira, com ofício. Por telefone não podemos.'],['s','17:00 · lida']]}
+];
+function openTH(i){push(TH[i].n,chat(TH[i].m),'chat');}
+var PH=[
+{e:'📄',t:'19:10',c:'Procuração em nome de Marta Braga. <b>A assinatura do vovô está tremida e diferente</b> de todas as anteriores.'},
+{e:'🩺',t:'19:15',c:'Laudo médico assinado pelo Dr. Vinícius Pires declarando o avô «incapaz». <b>A data do laudo é anterior à consulta registrada</b> na agenda do vovô.'},
+{e:'🚪',t:'20:05',c:'Placa no portão: <b>Orla Nova Empreendimentos</b>. Ninguém explicou por que uma construtora entra na propriedade.'},
+{e:'🗄️',t:'20:30',c:'Escritório do vovô. <b>O cofre está aberto</b> e faltam pastas. Marta aparece refletida no vidro do armário.'},
+{e:'👢',t:'21:55',c:'Pegadas de lama na varanda, do jardim até a casa de barcos. <b>Dois tamanhos diferentes</b>: um sapato social e uma bota.'},
+{e:'⛵',t:'22:00',c:'Doca ao fundo, tempestade. <b>Um bote a remo está solto</b>, amarrado só por um nó frouxo.'},
+{e:'💍',t:'03/08',c:'Foto antiga: Vinícius ajoelhado na varanda com o anel. Legenda: <b>«Ele me pediu em casamento hoje. 3 de agosto.»</b>'},
+{e:'🍽️',t:'20:15',c:'Mesa do jantar. Marta e Vinícius trocam olhares; <b>Miqueias está com o celular embaixo da mesa</b>.'},
+{e:'🌩️',t:'21:48',c:'Poste caído e casa no escuro. <b>Alguém desligou o gerador de propósito</b>: o quadro de força está aberto no fundo.'},
+{e:'✉️',t:'21:53',c:'Bilhete debaixo da porta do quarto, letra irregular: <b>«Não vá à casa de barcos sozinha. Eles sabem.»</b>'},
+{e:'🍳',t:'22:02',c:'Miqueias na cozinha comendo, <b>com o relógio da parede ao fundo marcando 22:02</b>. Ele não estava perto do lago.'},
+{e:'💾',t:'21:20',c:'Sophia colocando algo dentro do relógio de pêndulo da varanda. <b>Um pen drive</b>, pelo brilho.'},
+{e:'🪧',t:'20:35',c:'Placa antiga no porão: <b>«Fundação Braga, fundada em 1972»</b>. Do lado, um post-it da Helena: «uso esse ano pra tudo que eu quero guardar longe da Marta.»'}
+];
+function openPH(i){photoView(PH[i]);}
+var NT=[
+{t:'Matéria: Fundação Braga',d:'quarta',b:'Hipótese: Marta usa a fundação pra vender o terreno do lago.\nComprador: Orla Nova.\nO problema: pra vender ela precisa de procuração do vovô.\nO vovô só perde o direito de decidir se for declarado incapaz.'},
+{t:'Quem ganha se o vovô for declarado incapaz?',d:'ontem',b:'1. Marta: assume a procuração e vende\n2. Orla Nova: compra barato\n3. Quem assinou o laudo: comissão?\n4. Miqueias: o furo da carreira dele'},
+{t:'O Vini',d:'mês passado',b:'A senha dele é sempre a data do pedido de casamento: dia e mês, quatro números.\nele acha que eu não sei kkk\nNunca pensei que ia precisar disso.'},
+{t:'senha do Insta',d:'2 semanas atrás',b:'uso o aniversário da Bela, minha sobrinha, pra tudo que eu não quero que a Marta descubra\n22 de julho\nela nem sabe que esse perfil existe'},
+{t:'Quem ouviu o quê',d:'hoje, 20:50',b:'Marta não deixa eu falar com o vovô sozinha.\nO Anselmo parece assustado.\nA Sophia sabe mais do que diz.\nO Miqueias está pressionando demais.'},
+{t:'se algo acontecer comigo',d:'hoje, 21:40',l:1,b:'Cópias de tudo no pen drive dentro do relógio da varanda.\nO Anselmo sabe onde eu escondo o resto.\nNão confiem no Vinícius, mesmo que ele diga que me ama.'},
+{t:'plano B',d:'hoje, 21:55',l:1,b:'Se eu precisar sumir, uso o bote da doca e atravesso até a casa das redes do Anselmo.\nMinha luz vai estar apagada.\nQuem vier procurar no lago, vai achar só o celular.'}
+];
+var CL=[
+{a:'V',c:'#3a5a7a',n:'Vinícius',p:'perdida',r:1,t:'21:35'},
+{a:'M',c:'#6a3a4a',n:'Marta',p:'recebida · 2 min',t:'21:00'},
+{a:'M',c:'#7a5a3a',n:'Miqueias',p:'recebida · 11 min',t:'20:10'},
+{a:'A',c:'#4a5a5a',n:'Seu Anselmo',p:'recebida · 0:19',t:'21:52'},
+{a:'?',c:'#333',n:'Número desconhecido',p:'perdida',r:1,t:'22:04'},
+{a:'?',c:'#333',n:'Número desconhecido',p:'perdida',r:1,t:'22:09'},
+{a:'⚖',c:'#5a4a6a',n:'Cartório Ferraz',p:'feita · 3 min',t:'17:00'}
+];
+var SO=[
+{b:'Miqueias',x:'apagou um story às 20:42: «Prazo é segunda. Ninguém segura essa matéria.»',t:'hoje'},
+{b:'Orla Nova Empreendimentos',x:'começou a seguir seu perfil. Antes disso, só seguia Marta.',t:'hoje, 19:00'},
+{b:'Marta',x:'publicou foto com um homem de terno na varanda: «Parceiros de longa data»',t:'hoje, 18:45'},
+{b:'Sophia',x:'te enviou pedido de «melhores amigos» com a mensagem «confia em mim»',t:'hoje, 21:10'},
+{b:'Desconhecido',x:'viu seu story 6 vezes às 22:00. Perfil sem foto.',t:'hoje, 22:00'}
+];
+var EM=[
+{b:'Orla Nova: Reunião de assinatura',x:'Confirmamos a reunião de 23/09 para assinatura da escritura. Conforme combinado, a procuração de Marta Braga será apresentada.',t:'ontem'},
+{b:'Cartório Ferraz: Firma reconhecida',x:'Prezada, o reconhecimento de firma do Sr. Alberto Braga em 12/09 foi feito sem comparecimento.',t:'quinta'},
+{b:'Vinícius Pires: Sobre o laudo',x:'Precisamos conversar antes que isso vire um problema maior. Vem sozinha.',t:'hoje, 09:12'},
+{b:'Miqueias: PRAZO',x:'Segunda 8h, sem desculpa. Ou sai com seu nome ou sai sem.',t:'hoje, 07:50'},
+{b:'Rascunho: título da matéria',x:'«Fundação Braga: como um laudo pode ter roubado o lago de uma família»',t:'rascunho'},
+{b:'Lembrete pra mim mesma',x:'Mudei a senha da Galeria pra data que tudo começou: o dia que vi o carro da Orla Nova pela primeira vez, 05 de setembro.',t:'quinta'}
+];
+var AG=[
+{b:'Jantar em família',x:'19:30, sala principal. Presença obrigatória.',t:'hoje'},
+{b:'Conversar com o vovô sozinha',x:'21:00. Marta bloqueou: «ele está dormindo».',t:'hoje'},
+{b:'Casa de barcos, 22:00',x:'Lembrete criado por Helena: «só sair se o Anselmo confirmar que está seguro».',t:'hoje'},
+{b:'Publicar matéria',x:'Segunda, 08:00. Miqueias já avisou o jurídico.',t:'segunda'},
+{b:'Reunião Orla Nova',x:'23/09. Anotação: «se a procuração vale, a escritura sai. Preciso impedir antes».',t:'próxima segunda'}
+];
+var GR=[
+{b:'Gravador 1',x:'Transcrição: «...assina logo, o laudo já está pronto... só falta ela não descobrir antes de segunda...» (voz abafada, atrás de uma porta)',t:'hoje, 20:40'},
+{b:'Gravador 2',x:'Transcrição: «Se eu não voltar pra sala até 22:30, chequem o relógio da varanda.»',t:'hoje, 21:47'},
+{b:'Gravador 3',x:'Transcrição: vento e chuva forte, passos rápidos na madeira... «Quem está aí?»... corta.',t:'hoje, 22:03'},
+{b:'Gravador 4 (oculto)',x:'Transcrição: «...a assinatura final fica pra dia 04 de outubro, antes disso ninguém pode saber do Renan...» (voz de Marta, ao telefone)',t:'hoje, 21:15'}
+];
+var SA=[
+{b:'Passos',x:'De 22:05 a 22:12: 412 passos, indo do jardim até a casa de barcos.',t:'hoje'},
+{b:'Batimentos',x:'Pico de 148 bpm às 22:09. Depois cai para 96 bpm às 22:11, como se ela tivesse se afastado do perigo.',t:'hoje'},
+{b:'Última atividade',x:'22:12: celular parado por 29 minutos, até ser encontrado por Sophia às 22:41.',t:'hoje'}
+];
+var LO=[
+{b:'19:05',x:'Casa principal',t:'chegada'},
+{b:'20:40',x:'Escritório do vovô, 6 minutos',t:'hoje'},
+{b:'21:47',x:'Varanda, perto do relógio de pêndulo',t:'hoje'},
+{b:'22:05',x:'Jardim, caminhando para a casa de barcos',t:'hoje'},
+{b:'22:12',x:'Casa de barcos. Depois disso o celular não se move. Doca próxima. Sinal do GPS vai e volta.',t:'hoje'},
+{b:'22:41',x:'Celular encontrado por Sophia, molhado e no chão',t:'hoje'}
+];
+
+/* ===================== CELULAR DO VINÍCIUS ===================== */
+var VM=[
+ ['s','ontem'],['t','Ela está desconfiada. O laudo precisa estar no cartório antes de segunda.','Marta'],
+ ['m','Marta, eu não sei se consigo continuar com isso.'],['T','Você já assinou. Se cair, cai junto.','Marta'],
+ ['s','hoje, 21:59'],['T','Fale com ela na casa de barcos. Eu cuido do resto.','Marta'],['M','Ela não pode se machucar. Prometa.'],
+ ['t','Ninguém vai encostar nela. Só quero o pen drive.','Marta'],
+ ['s','22:14'],['M','Ela não está aqui. O barco sumiu e o celular dela ficou no chão.'],['T','Procure na doca. E não deixe o Anselmo chegar perto.','Marta']
+];
+var VN=[
+{t:'Laudo do vovô',d:'12/09',b:'Assinei sem examinar. Marta disse que era só formalidade.\nO cartório não vai perceber a data.'},
+{t:'Comissão Orla Nova',d:'semana passada',b:'R$ 180.000 de «consultoria médica».\nMarta jura que ninguém sai machucado.'},
+{t:'confessar pro vovô?',d:'hoje, 22:30',b:'Eu não queria isso.\nSe a Helena publicar, acabou pra mim.\nSe eu contar, acabou pra Marta. Mas o vovô merece saber.'}
+];
+var VE=[
+{b:'Orla Nova: Contrato de consultoria',x:'Anexo: honorários de R$ 180.000 condicionados à conclusão da escritura.',t:'segunda passada'},
+{b:'Marta: sem provas',x:'Apague o e-mail do laudo. Nada de rastros.',t:'quinta'}
+];
+var VG=[
+{b:'Áudio de Marta (encaminhado)',x:'«Quando o vovô se for, a fundação vem pra mim de qualquer jeito. Só estamos antecipando o inevitável.»',t:'quinta'}
+];
+var IGM=[
+ ['t','Chegou o resto dos documentos que você me pediu ontem.','Eloh'],
+ ['m','Perfeito, muito obrigada. Você é a única em quem confio no jornal.'],
+ ['t','Cuidado com o que a Marta pode fazer. Ela ligou pro Miqueias hoje.','Eloh'],
+ ['m','Vou publicar segunda de qualquer jeito.'],
+ ['T','Lembra: mudei a senha do seu e-mail do trabalho pra data que você pegou aquele papel no cartório, 12 de setembro. Não esquece.','Eloh'],
+ ['m','1209. Anotado.'],
+ ['t','Boa festa. Manda notícias depois.','Eloh']
+];
+function openIG(){push('Instagram · @helena.braga.oficial (privado)',chat(IGM),'chat');}
+var CF=[
+{t:'Sócio oculto',x:'Documentos mostram que o Dr. Renan Osório, advogado ligado à prefeitura, é sócio invisível da Orla Nova Empreendimentos. Nunca assina nada com o próprio nome.'},
+{t:'Dívida da Marta',x:'Marta deve R$ 90 mil a Renan, de um empréstimo antigo. A venda do terreno do lago quitaria a dívida e ainda geraria lucro pros dois.'},
+{t:'Áudio gravado sem querer',x:'«Se a Helena sumir de vez, ninguém vai investigar a fundo. Isso é problema seu, Marta, não meu.» — voz identificada como Renan Osório.'},
+{t:'O plano da Helena',x:'Ela deixou uma cópia de tudo com a Eloh, de outro jornal, e outra no pen drive do relógio da varanda. Só falta alguém de confiança juntar as duas partes.'}
+];
+function openCF(){push('Cofre',items(CF));}
+var VP=[{e:'📸',t:'12/09',c:'Foto do laudo com o carimbo do cartório. <b>A data de emissão foi rasurada à mão</b>.'}];
+function openPin(){ openLock('vin','Celular do Vinícius','quatro números. Ele mantém a mesma senha há anos.','0308', vhome); }
+function vhome(){
+  push('Celular do Vinícius','<div class="apps" style="padding:14px 18px">'+
+  [['💬','Mensagens','vmsg'],['📝','Notas','vnote'],['✉️','E-mail','vmail'],['🎙️','Gravador','vrec'],['🖼️','Fotos','vpic']].map(function(x){
+   return '<button class="app" onclick="'+x[2]+'()"><div class="icon">'+x[0]+'</div><span class="l">'+x[1]+'</span></button>';}).join('')+'</div>');
+}
+function vmsg(){push('Marta',chat(VM),'chat');}
+function vnote(){push('Notas',notes(VN));}
+function vmail(){push('E-mail',items(VE));}
+function vrec(){push('Gravador',items(VG));}
+function vpic(){push('Fotos','<div class="grid"><div class="ph" onclick="photoView(VP[0])">📸</div></div>');}
+
+/* ===================== SOLUÇÃO ===================== */
+function openSol(){
+  push('Solução','<div class="cap" style="padding:16px" id="sw">Só toque quando todo mundo votou. Não tem volta.<br><br><button class="btn" onclick="document.getElementById(\'st\').style.display=\'block\';document.getElementById(\'sw\').style.display=\'none\'">revelar solução</button></div>'+
+  '<div id="st" class="cap" style="display:none;padding:16px;line-height:1.7"><b>Vilões: Marta e Vinícius.</b><br><br>Marta queria vender o terreno do lago para a Orla Nova e, para isso, precisava da procuração do avô. O Dr. Vinícius assinou um laudo falso, recebendo R$ 180 mil. Helena descobriu tudo e ia publicar. No dia da tempestade, os dois desligaram o gerador e mandaram Vinícius atrair Helena até a casa de barcos para pegar o pen drive.<br><br><b>Inocentes:</b> Miqueias (pressionava pelo furo, mas está na foto da cozinha às 22:02), Sophia (aliada, deixou o pen drive e achou o celular) e Seu Anselmo (avisou Helena e deixou o bote solto).<br><br><b>Final secreto:</b> ninguém sequestrou Helena. Ela ouviu passos, largou o celular de propósito e fugiu de bote até a casa das redes do Anselmo, do outro lado do lago. Está sã e salva e já tem as provas no pen drive do relógio da varanda.<br><br><b>Pistas-chave:</b> laudo com data errada, cofre aberto, dois pares de pegada, gerador desligado, mensagens do Vinícius e da Marta e o celular do Vinícius (senha 0308).<br><br><b>Camada extra (parte 2):</b> por trás da Marta está o Dr. Renan Osório, sócio oculto da Orla Nova e credor dela. Foi ele quem disse, gravado sem querer, que preferia que a Helena sumisse de vez. As provas estão no Cofre do celular, guardado atrás de uma cadeia de senhas escondidas entre os apps.</div>');
+}
+
+/* ===================== HOME ===================== */
+var APP=[
+ ['💬','Mensagens',function(){push('Mensagens',rows(TH.map(function(x){return {a:x.a,c:x.c,n:x.n,p:x.p,t:x.t};}),'openTH'));},9],
+ ['📝','Notas',function(){tryOpen('notas','Notas','quatro números. Uma data de alguém da família que ela nunca esquece.','1504',function(){push('Notas',notes(NT));});},2,'notas'],
+ ['📷','Instagram',function(){tryOpen('insta','Instagram','quatro números. Aniversário de alguém que ela ama muito.','2207',openIG);},0,'insta'],
+ ['✉️','E-mail',function(){tryOpen('email','E-mail','quatro números, dia e mês. Ligado a um documento importante.','1209',function(){push('E-mail',items(EM));});},5,'email'],
+ ['🖼️','Galeria',function(){tryOpen('galeria','Galeria','quatro números. O dia em que tudo começou pra ela.','0509',function(){push('Galeria',photos(PH,'openPH'));});},0,'galeria'],
+ ['📞','Ligações',function(){push('Ligações',rows(CL,'void'));}],
+ ['🔔','Redes',function(){push('Redes',items(SO));},3],
+ ['📅','Agenda',function(){push('Agenda',items(AG));}],
+ ['🎙️','Gravador',function(){tryOpen('grav','Gravador','quatro números. Não é uma data, é um ano.','1972',function(){push('Gravador',items(GR));});},3,'grav'],
+ ['❤️','Saúde',function(){push('Saúde',items(SA));}],
+ ['📍','Localização',function(){push('Localização',items(LO));}],
+ ['🗝️','Cofre',function(){tryOpen('cofre','Cofre','quatro números. Um dia de outubro que ainda vai chegar.','0410',openCF);},0,'cofre'],
+ ['🔒','Celular do Vinícius',openPin],
+ ['🔍','Solução',openSol]
+];
+function renderApps(){
+  var c=document.getElementById('apps');c.innerHTML='';
+  APP.forEach(function(a){
+    var locked=a[4]&&!unlocked[a[4]];
+    var b=document.createElement('button');b.className='app';
+    var badge=locked?'<span class="badge" style="background:#555">🔒</span>':(a[3]?'<span class="badge">'+a[3]+'</span>':'');
+    b.innerHTML='<div class="icon">'+a[0]+badge+'</div><span class="l">'+a[1]+'</span>';
+    b.onclick=a[2];c.appendChild(b);
+  });
+}
+renderApps();
+function void0(){}
+window['void']=void0;
+</script>
+</body>
+</html>

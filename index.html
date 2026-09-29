@@ -3,353 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>O Celular da Aline</title>
+<title>O Celular Misterioso — Capítulos</title>
 <style>
 :root{
-  --bg:#0f1013; --ink:#eceae6; --dim:#8f8d87; --panel:#17181c; --panel2:#1f2126;
-  --accent:#d4a24a; --accent-dim:#7a5f2c; --alert:#c8564a; --me:#2c4a4a; --them:#22242a;
+  --bg:#0d0e12; --ink:#eceae6; --dim:#8f8d87; --panel:#17181c; --accent:#d4a24a;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;}
-html{scroll-padding-top:env(safe-area-inset-top,0px);}
-body{margin:0;min-height:100%;background:radial-gradient(ellipse at top,#1a1c22 0%,#08090a 70%);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);padding:24px 12px;}
-.frame{width:100%;max-width:380px;height:800px;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.7),inset 0 0 0 2px #2a2a2a;}
-.screen{width:100%;height:100%;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column;}
-.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:60;}
-.lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:70px;background:linear-gradient(170deg,#20242c 0%,#0f1013 65%);z-index:50;transition:transform .35s ease;}
-.lock.hidden{transform:translateY(-100%);}
-.lock .time{font-size:58px;font-weight:600;letter-spacing:-1px;}
-.lock .date{font-size:15px;color:var(--dim);margin-top:4px;}
-.lock .warn{margin-top:26px;background:rgba(255,255,255,.07);border-radius:14px;padding:10px 14px;font-size:12px;color:var(--dim);width:82%;line-height:1.5;}
-.lock .hint{margin-top:auto;margin-bottom:30px;font-size:12.5px;color:var(--dim);text-align:center;padding:0 30px;}
-.btn{padding:13px 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:20px;color:var(--ink);font-size:14px;cursor:pointer;font-family:inherit;}
-.home{flex:1;display:flex;flex-direction:column;padding:46px 18px 14px;overflow-y:auto;}
-.status{font-size:12px;color:var(--dim);text-align:center;}
-.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;margin-top:18px;}
-.app{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;color:var(--ink);font-family:inherit;cursor:pointer;}
-.icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;background:var(--panel2);}
-.badge{position:absolute;top:-4px;right:-4px;background:var(--alert);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
-.app span.l{font-size:10.5px;color:var(--dim);text-align:center;}
-.foot{margin-top:auto;text-align:center;font-size:11px;color:var(--dim);padding-top:14px;}
-.appscreen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;z-index:30;}
-.appscreen.active{transform:translateX(0);}
-.topbar{display:flex;align-items:center;gap:10px;padding:52px 16px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:var(--panel);flex-shrink:0;}
-.back{background:none;border:none;color:var(--accent);font-size:20px;padding:0 8px 0 0;cursor:pointer;}
-.topbar h2{font-size:16px;margin:0;font-weight:600;}
-.list{flex:1;overflow-y:auto;padding:8px 0;}
-.list::-webkit-scrollbar,.chat::-webkit-scrollbar{display:none;}
-.row{display:flex;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}
-.av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
-.row .m{flex:1;min-width:0;}
-.row .n{font-size:13.5px;font-weight:600;}
-.row .p{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.row .p.red{color:var(--alert);}
-.row .t{font-size:10.5px;color:var(--dim);align-self:flex-start;}
-.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;}
-.b{max-width:80%;padding:8px 12px;border-radius:16px;font-size:13px;line-height:1.4;}
-.b.t{align-self:flex-start;background:var(--them);border-bottom-left-radius:4px;}
-.b.m{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px;}
-.b.c{box-shadow:0 0 0 1px var(--accent-dim);}
-.st{font-size:9.5px;color:var(--dim);text-align:center;margin:4px 0;}
-.who{font-size:10.5px;color:var(--accent);margin-bottom:-4px;margin-left:2px;}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;}
-.ph{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--panel2);cursor:pointer;}
-.pv{padding:16px;}
-.big{width:100%;aspect-ratio:4/5;background:var(--panel2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:14px;}
-.cap{font-size:12.5px;color:var(--dim);line-height:1.6;}
-.cap b{color:var(--ink);}
-.note{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
-.note .nt{font-size:13.5px;font-weight:600;margin-bottom:3px;}
-.note .nd{font-size:10.5px;color:var(--dim);margin-bottom:7px;}
-.note .nb{font-size:12.5px;color:#d6d3cb;line-height:1.6;white-space:pre-line;}
-.it{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px;line-height:1.55;}
-.it b{color:var(--accent);}
-.it .tm{font-size:10.5px;color:var(--dim);margin-top:4px;}
-.it .body{margin-top:6px;color:#d6d3cb;}
-.pinw{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:40px;}
-.dots{display:flex;gap:14px;margin:18px 0 26px;}
-.dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--dim);}
-.dot.on{background:var(--accent);border-color:var(--accent);}
-.keys{display:grid;grid-template-columns:repeat(3,70px);gap:14px;}
-.key{height:60px;border-radius:50%;background:var(--panel2);border:none;color:var(--ink);font-size:22px;font-family:inherit;cursor:pointer;}
-.key.x{background:none;cursor:default;}
-.shake{animation:sh .35s;}
-@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+body{
+  margin:0;min-height:100%;background:radial-gradient(ellipse at top,#1a1c22 0%,#08090a 70%);
+  display:flex;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);padding:40px 16px;
+}
+.wrap{width:100%;max-width:440px;}
+h1{font-size:22px;margin:0 0 4px;}
+.sub{color:var(--dim);font-size:13.5px;margin-bottom:28px;line-height:1.5;}
+.card{
+  display:flex;align-items:center;gap:14px;background:var(--panel);
+  border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px;margin-bottom:12px;
+  text-decoration:none;color:var(--ink);
+}
+.card.locked{opacity:.45;}
+.num{
+  width:44px;height:44px;border-radius:12px;background:#000;display:flex;align-items:center;
+  justify-content:center;font-weight:700;color:var(--accent);flex-shrink:0;font-size:16px;
+}
+.card .t{font-size:15px;font-weight:600;}
+.card .d{font-size:12px;color:var(--dim);margin-top:2px;}
+.tag{margin-left:auto;font-size:10.5px;color:var(--dim);white-space:nowrap;}
 </style>
 </head>
 <body>
-<div class="frame"><div class="screen" id="scr">
-<div class="notch"></div>
-<div class="lock" id="lock">
-  <div class="time">23:58</div>
-  <div class="date">quinta-feira, 12 de novembro</div>
-  <div class="warn">⚠️ Queda de energia no prédio da Vórtice às 23:41, durante a festa de lançamento. Câmeras do 7º andar fora do ar por 6 minutos.</div>
-  <div class="hint">celular achado na sala de servidores, tela pra baixo. Sem senha: ela nunca trancava.</div>
-  <button class="btn" onclick="document.getElementById('lock').classList.add('hidden')">desbloquear ↑</button>
+<div class="wrap">
+  <h1>📱 O Celular Misterioso</h1>
+  <div class="sub">Cada capítulo é uma vítima diferente, um celular achado depois de um sumiço. Investigue os apps, descubra as senhas escondidas e chegue à solução.</div>
+
+  <a class="card" href="capitulo1.html">
+    <div class="num">1</div>
+    <div><div class="t">O Celular da Helena</div><div class="d">Casa no lago, tempestade, uma família dividida.</div></div>
+    <div class="tag">fácil</div>
+  </a>
+
+  <a class="card" href="capitulo2.html">
+    <div class="num">2</div>
+    <div><div class="t">O Celular da Aline</div><div class="d">Startup, fraude de investidores, festa de lançamento.</div></div>
+    <div class="tag">médio</div>
+  </a>
+
+  <a class="card" href="capitulo3.html">
+    <div class="num">3</div>
+    <div><div class="t">O Celular da Camila</div><div class="d">Casamento, apagão, uma dívida escondida.</div></div>
+    <div class="tag">difícil</div>
+  </a>
+  <div class="card locked">
+    <div class="num">4</div>
+    <div><div class="t">Em breve</div><div class="d">Novo caso, mais difícil, mais senhas encadeadas.</div></div>
+    <div class="tag">em breve</div>
+  </div>
+  <div class="card locked">
+    <div class="num">5</div>
+    <div><div class="t">Em breve</div><div class="d">Novo caso, mais difícil, mais senhas encadeadas.</div></div>
+    <div class="tag">em breve</div>
+  </div>
+  <div class="card locked">
+    <div class="num">6</div>
+    <div><div class="t">Em breve</div><div class="d">Novo caso, mais difícil, mais senhas encadeadas.</div></div>
+    <div class="tag">em breve</div>
+  </div>
 </div>
-<div class="home">
-  <div class="status">Aline Ferraz, 26, gerente de produto na Vórtice · desaparecida desde as 23:47</div>
-  <div class="apps" id="apps"></div>
-  <div class="foot">bateria 6% · sincronizando...</div>
-</div>
-</div></div>
-
-<script>
-var scr=document.getElementById('scr'),stack=[],cur='';
-function push(title,html,cls){
-  var d=document.createElement('div');d.className='appscreen';
-  d.innerHTML='<div class="topbar"><button class="back">‹</button><h2>'+title+'</h2></div><div class="'+(cls||'list')+'">'+html+'</div>';
-  d.querySelector('.back').onclick=pop;scr.appendChild(d);
-  requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('active');});});
-  stack.push(d);return d;
-}
-function pop(){var d=stack.pop();if(!d)return;d.classList.remove('active');setTimeout(function(){d.remove();},300);}
-var unlocked={},lockCtx=null;
-function openLock(id,title,hint,password,onSuccess){
-  cur='';var k='';
-  for(var i=1;i<=9;i++)k+='<button class="key" onclick="pinTry('+i+')">'+i+'</button>';
-  k+='<button class="key x"></button><button class="key" onclick="pinTry(0)">0</button><button class="key" onclick="pinDelG()">⌫</button>';
-  lockCtx={password:password,onSuccess:onSuccess,id:id};
-  push(title,'<div style="font-size:15px">Digite a senha</div><div class="cap" style="text-align:center;padding:6px 30px 0">'+hint+'</div><div class="dots" id="dotsG"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="keys">'+k+'</div>','pinw');
-}
-function pinTry(n){
-  if(cur.length>=4)return;cur+=n;dotsG();
-  if(cur.length===4){setTimeout(function(){
-    if(cur===lockCtx.password){unlocked[lockCtx.id]=true;pop();cur='';renderApps();lockCtx.onSuccess();}
-    else{var d=document.getElementById('dotsG');d.classList.add('shake');setTimeout(function(){d.classList.remove('shake');cur='';dotsG();},400);}
-  },200);}
-}
-function pinDelG(){cur=cur.slice(0,-1);dotsG();}
-function dotsG(){var e=document.querySelectorAll('#dotsG .dot');for(var i=0;i<e.length;i++)e[i].classList.toggle('on',i<cur.length);}
-function tryOpen(id,title,hint,password,fn){ if(unlocked[id]) fn(); else openLock(id,title,hint,password,fn); }
-
-var K={t:'b t',m:'b m',T:'b t c',M:'b m c'};
-function chat(a){return a.map(function(x){
-  if(x[0]==='s')return '<div class="st">'+x[1]+'</div>';
-  return (x[2]?'<div class="who">'+x[2]+'</div>':'')+'<div class="'+K[x[0]]+'">'+x[1]+'</div>';}).join('');}
-function rows(a,fn){return a.map(function(x,i){
-  return '<div class="row" onclick="'+fn+'('+i+')"><div class="av" style="background:'+x.c+'">'+x.a+'</div><div class="m"><div class="n">'+x.n+'</div><div class="p '+(x.r?'red':'')+'">'+x.p+'</div></div><div class="t">'+x.t+'</div></div>';}).join('');}
-function notes(a){return a.map(function(x){
-  return '<div class="note"><div class="nt">'+x.t+'</div><div class="nd">'+x.d+'</div><div class="nb">'+x.b+'</div></div>';}).join('');}
-function items(a){return a.map(function(x){
-  return '<div class="it"><b>'+x.b+'</b>'+(x.x?'<div class="body">'+x.x+'</div>':'')+'<div class="tm">'+x.t+'</div></div>';}).join('');}
-function photos(a,fn){return '<div class="grid">'+a.map(function(x,i){return '<div class="ph" onclick="'+fn+'('+i+')">'+x.e+'</div>';}).join('')+'</div>';}
-function photoView(x){push(x.t,'<div class="big">'+x.e+'</div><div class="cap">'+x.c+'</div>','list pv');}
-
-/* ===================== CELULAR DA ALINE ===================== */
-var TH=[
-{a:'🚀',c:'#3a3f4a',n:'Squad Vórtice 2.0',p:'Sophia: alguém viu a Aline?',t:'23:44',m:[
- ['t','pessoal, energia caiu no prédio inteiro, alguém sabe o que houve?','Miqueias'],
- ['t','o gerador do 7º andar não ligou, isso nunca aconteceu','Renata'],
- ['m','estou tentando falar com a segurança'],
- ['t','Aline, cadê você? o Otávio Serra tá perguntando de você lá embaixo','Renata'],
- ['t','alguém viu a Aline? ela sumiu do meio da festa','Sophia'],
- ['s','23:44 · 6 pessoas']]},
-{a:'R',c:'#6a3a3a',n:'Renata (CEO)',p:'guarda esse assunto pra depois da rodada',t:'22:10',m:[
- ['t','Preciso falar com você antes da apresentação de hoje.'],
- ['m','É sobre os números de usuários ativos?'],
- ['T','Guarda esse assunto pra depois da rodada de investimento, Aline. Tá tudo sob controle.'],
- ['m','Renata, um terço desses usuários são contas fantasmas. Vou falar isso no palco se precisar.'],
- ['T','Você não vai fazer isso na frente do Otávio Serra. Isso quebraria a empresa.'],
- ['m','Então explica os números direito, com a verdade.'],
- ['t','Depois da festa. Aqui não.'],
- ['s','22:10 · lida']]},
-{a:'M',c:'#4a5a6a',n:'Miqueias (CTO)',p:'não fala nada até eu te mostrar uma coisa',t:'23:05',m:[
- ['t','Aline, antes de qualquer coisa, deixa eu te mostrar uma coisa na sala de servidores.'],
- ['m','Agora? a festa já começou'],
- ['T','É rápido. Não fala nada pra ninguém até eu te mostrar uma coisa, prometo que muda sua cabeça sobre isso tudo.'],
- ['m','Tá bem, te encontro lá às 23:40'],
- ['t','Vem sozinha. É delicado.'],
- ['s','23:05 · entregue']]},
-{a:'S',c:'#5a4a6a',n:'Sophia (Growth)',p:'não confia em tudo que o Miqueias fala',t:'23:12',m:[
- ['t','Ah, hoje faz 3 anos que você entrou na Vórtice! 3 de junho, lembra? Fizemos até bolo.'],
- ['t','Vi você saindo mais cedo da apresentação, tá tudo bem?'],
- ['m','Descobri uma coisa grave sobre os números, Sophia.'],
- ['T','Eu sei. Suspeito disso há semanas. Não confia em tudo que o Miqueias fala, ele está mais estranho que o normal.'],
- ['m','Por quê?'],
- ['t','Ele e a Renata se trancaram na sala dela hoje de manhã, por quase uma hora.'],
- ['s','23:12 · lida']]},
-{a:'E',c:'#5a6a4a',n:'Eloh (jornalista)',p:'me manda qualquer coisa que você tiver hoje',t:'21:30',m:[
- ['t','Recebi seu áudio de ontem. Isso é sério, Aline.'],
- ['m','Vou tentar pegar mais provas hoje na festa.'],
- ['T','Cuidado. Se o Otávio Serra descobrir antes da rodada fechar, ele pode reagir mal — ele já perdeu muito dinheiro nesse tipo de aposta antes.'],
- ['m','Vou ficar de olho.'],
- ['t','Me manda qualquer coisa que você tiver hoje, mesmo que pareça pouco.'],
- ['s','21:30 · lida']]},
-{a:'N',c:'#4a4a4a',n:'Seu Nato (segurança)',p:'vi o CTO descendo pela escada de emergência',t:'23:50',m:[
- ['t','Dona Aline, a senhora está bem? Vi tumulto lá em cima.'],
- ['T','Vi o CTO descendo pela escada de emergência correndo, sozinho, uns 5 minutos atrás.'],
- ['t','Deixei a porta dos fundos destrancada, caso a senhora precise sair rápido e sem ser vista.'],
- ['s','23:50 · entregue']]}
-];
-function openTH(i){push(TH[i].n,chat(TH[i].m),'chat');}
-
-var PH=[
-{e:'📊',t:'22:00',c:'Print do dashboard de usuários ativos. <b>Um filtro escondido remove 40 mil contas</b> sempre que alguém de fora da empresa olha o número.'},
-{e:'🤖',t:'22:05',c:'Lista de contas criadas na mesma madrugada, todas com o mesmo padrão de e-mail. <b>Bots</b>, aparentemente comprados.'},
-{e:'🖥️',t:'23:38',c:'Foto tremida da sala de servidores. <b>Miqueias mexendo em um HD externo</b>, sem perceber que estava sendo fotografado.'},
-{e:'📄',t:'21:00',c:'Contrato do aporte: <b>R$ 50 milhões do investidor Otávio Serra</b>, condicionados a "métricas de crescimento validadas".'},
-{e:'🪜',t:'23:45',c:'Escada de emergência do 7º andar, foto escura. <b>Duas silhuetas</b> descendo às pressas.'},
-{e:'🚪',t:'23:49',c:'Porta dos fundos do prédio, entreaberta, chuva lá fora. <b>Um crachá caído no chão</b>, perto da soleira.'},
-{e:'🎂',t:'03/06',c:'Foto do bolo de "3 anos de Vórtice" da Aline. Legenda: <b>«3 anos aqui hoje, mal posso acreditar»</b>.'},
-{e:'🐈',t:'14/02',c:'Foto do gato dela, Pixel, com balões. Legenda: <b>«feliz aniversário, Pixel! hoje o danado completa 3 anos»</b>.'},
-{e:'🏢',t:'antiga',c:'Foto de uma placa na recepção: <b>«Vórtice — fundada em 2016»</b>.'},
-{e:'👨‍💼',t:'21:50',c:'Foto do investidor Otávio Serra apertando a mão da Renata no tapete vermelho da festa, sorrindo pras câmeras.'},
-{e:'📱',t:'23:06',c:'Print de e-mail arquivado: assunto «Métricas — não repassar antes de 21/03», data da primeira reunião com o Otávio Serra.'},
-{e:'🕯️',t:'23:20',c:'Foto da mesa de bebidas. Ao fundo, <b>Renata sussurrando no ouvido do Miqueias</b>, os dois sérios.'}
-];
-function openPH(i){photoView(PH[i]);}
-
-var NT=[
-{t:'os números não fecham',d:'ontem',b:'40 mil contas somem quando alguém olha de fora\nisso não é erro de sistema, é filtro de propósito\nvou confrontar alguém hoje na festa'},
-{t:'quem ganha com isso',d:'anteontem',b:'1. Renata: rodada salva a empresa da falência\n2. Miqueias: mantém o cargo, talvez receba bônus\n3. Otávio Serra: dobra o investimento se acreditar no crescimento\n4. eu: perco meu emprego se abrir a boca'},
-{t:'senha do Insta',d:'mês passado',b:'uso o aniversário do Pixel, meu gato, de senha desse perfil\n14 de fevereiro, dia que ele completou 3 aninhos\nninguém do trabalho sabe desse perfil'},
-{t:'Miqueias e as senhas dele',d:'faz tempo',b:'ele sempre usa o aniversário da filha dele em tudo\nele mesmo me contou rindo, achando engraçado\n7 de setembro'},
-{t:'plano pra festa',d:'hoje, 20:00',b:'1. gravar qualquer confissão possível\n2. mandar tudo pra Eloh em tempo real\n3. se o Miqueias mostrar algo na sala de servidores, tirar fotos\n4. não ficar sozinha com a Renata'},
-{t:'se eu sumir',d:'hoje, 23:15',b:'os prints estão comigo e com a Eloh\nnão confiem no Miqueias, mas ele pode não ser o pior da história\nprocurem quem realmente lucra com a rodada de investimento'}
-];
-
-var IGM=[
- ['t','Você me mandou os prints ontem à noite, recebi tudo.','Eloh'],
- ['m','Perfeito. Ainda vou conseguir mais hoje na festa.'],
- ['t','Cuidado com o Otávio Serra. Descobri que ele já processou dois fundadores por "fraude de métricas" antes — ele não brinca quando perde dinheiro.','Eloh'],
- ['m','Vou publicar segunda de qualquer jeito, com ou sem a empresa inteira em cima de mim.'],
- ['T','Mudei a senha do meu e-mail de trabalho pra data que vi o dashboard fraudado pela primeira vez, 10 de agosto. Só pra constar.','Eloh'],
- ['m','1008. Boa lembrança.'],
- ['t','Boa festa. Qualquer coisa, me liga.','Eloh']
-];
-function openIG(){push('Instagram · @aline.fora.do.trabalho (privado)',chat(IGM),'chat');}
-
-var EM=[
-{b:'Vórtice: pauta da reunião de investidores',x:'Apresentação às 22h30. Métricas de crescimento validadas pelo time de dados.',t:'hoje, 09:00'},
-{b:'Miqueias: sobre os números',x:'Precisamos alinhar o discurso antes da apresentação de hoje. Me procura.',t:'hoje, 14:20'},
-{b:'Renata: confidencial',x:'O que conversamos ontem fica entre nós até a rodada fechar. Depois eu explico tudo com calma.',t:'ontem, 19:40'},
-{b:'Rascunho: matéria pra Eloh',x:'«Vórtice: como uma startup inflou usuários pra levantar R$ 50 milhões»',t:'rascunho'},
-{b:'Lembrete pra mim mesma',x:'Mudei a senha da galeria de fotos pra data da nossa primeira reunião com o Otávio Serra, 21 de março.',t:'quinta'}
-];
-
-var AG=[
-{b:'Apresentação Vórtice 2.0',x:'22:30, auditório do 7º andar. Presença obrigatória de toda a liderança.',t:'hoje'},
-{b:'Falar com o Miqueias',x:'23:00. Ele disse que ia me mostrar algo na sala de servidores.',t:'hoje'},
-{b:'Festa de lançamento',x:'23:15, terraço. Otávio Serra confirmado.',t:'hoje'},
-{b:'Publicar matéria com a Eloh',x:'Segunda, 08h.',t:'segunda'},
-{b:'Assinatura da rodada',x:'15 de novembro. Anotação: «se as métricas forem aceitas assim, o problema nunca mais sai do tapete».',t:'15/11'}
-];
-
-var GR=[
-{b:'Gravador 1',x:'Transcrição: «...se você fizer barulho hoje, quebra a rodada e quebra a empresa inteira, pensa direito...» (voz de Renata, abafada)',t:'hoje, 22:12'},
-{b:'Gravador 2',x:'Transcrição: «Só preciso que você venha comigo até os servidores, cinco minutos, eu resolvo isso com você.» (voz de Miqueias)',t:'hoje, 23:39'},
-{b:'Gravador 3',x:'Transcrição: passos correndo, uma porta batendo, silêncio, depois só o som da chuva.',t:'hoje, 23:47'},
-{b:'Gravador 4 (oculto)',x:'Transcrição: «...a assinatura final com o Otávio fica pra 15 de novembro, antes disso ninguém liga pro que a Aline andou dizendo...» (voz de Renata, ao telefone)',t:'hoje, 21:40'}
-];
-
-var SA=[
-{b:'Passos',x:'De 23:39 a 23:47: 380 passos, do auditório até a sala de servidores e depois até a escada de emergência.',t:'hoje'},
-{b:'Batimentos',x:'Pico de 152 bpm às 23:44. Cai pra 98 bpm às 23:49, como se o perigo tivesse ficado pra trás.',t:'hoje'},
-{b:'Última atividade',x:'23:47: celular parado, tela pra baixo, até ser encontrado por Sophia às 00:02.',t:'hoje'}
-];
-
-var LO=[
-{b:'22:00',x:'Auditório do 7º andar (apresentação)',t:'hoje'},
-{b:'22:45',x:'Sala da Renata, 8 minutos',t:'hoje'},
-{b:'23:39',x:'Sala de servidores, com o Miqueias',t:'hoje'},
-{b:'23:44',x:'Escada de emergência, descendo',t:'hoje'},
-{b:'23:47',x:'Área de carga do estacionamento. Sinal de GPS oscila e depois se perde.',t:'hoje'},
-{b:'00:02',x:'Celular encontrado por Sophia na sala de servidores, no chão',t:'hoje'}
-];
-
-var SO=[
-{b:'Miqueias',x:'apagou um story às 23:10: «hoje decide muita coisa»',t:'hoje'},
-{b:'Otávio Serra',x:'começou a seguir seu perfil profissional às 23:00, pela primeira vez em 2 anos de contrato',t:'hoje'},
-{b:'Renata',x:'postou foto do brinde com a legenda: «rumo aos 50 milhões, juntos» (com o Otávio ao lado)',t:'hoje, 22:50'},
-{b:'Sophia',x:'comentou numa foto antiga sua: «se cuida hoje, fica esperta»',t:'hoje, 21:15'},
-{b:'Desconhecido',x:'viu seu story 5 vezes às 23:41, perfil recém-criado, sem posts',t:'hoje'}
-];
-
-var CF=[
-{t:'Quem realmente lucra',x:'Planilha oculta mostra que Otávio Serra já era sócio minoritário da Vórtice antes da rodada — ele lucraria em dobro se o valuation inflado fosse aceito e triplicaria se revendesse a posição depois.'},
-{t:'Ameaça velada',x:'E-mail apagado do Otávio Serra pra Renata: «Você sabe o que acontece com fundadoras que me fazem perder dinheiro. Resolve isso antes de amanhã.»'},
-{t:'O acordo com Miqueias',x:'Mensagens mostram que Miqueias não queria machucar a Aline — só queria o notebook dela de volta antes que ela enviasse tudo pra imprensa. Ele se arrependeu na mesma noite.'},
-{t:'Pra onde a Aline foi',x:'Ela desceu pela escada de emergência, atravessou a área de carga e entrou na van de entregas que sai do prédio toda noite às 23:50. O motorista, sem saber de nada, a deixou na casa da Eloh.'}
-];
-function openCF(){push('Cofre',items(CF));}
-
-/* ===================== CELULAR DO MIQUEIAS ===================== */
-var VM=[
- ['s','ontem'],['t','A Aline está desconfiada dos números. Isso precisa sumir antes da rodada.','Renata'],
- ['m','Renata, eu não sei se aguento mentir mais.'],['T','Você já assinou os relatórios. Se isso cair, cai com você junto.','Renata'],
- ['s','hoje, 23:04'],['T','Chama ela pra sala de servidores. Só pra pegar o notebook, nada além disso.','Renata'],['M','Ninguém vai machucar ela. Prometo.'],
- ['t','Só quero aquele notebook de volta antes que envie o e-mail.','Renata'],
- ['s','23:48'],['M','Ela fugiu pela escada antes que eu conseguisse falar direito. O notebook ainda está com ela.'],['T','Procura no estacionamento. E não fala nada pro Otávio ainda.','Renata']
-];
-var VN=[
-{t:'dashboard fraudado',d:'2 meses atrás',b:'Renata pediu pra eu esconder as contas fantasmas do relatório pros investidores.\nEu topei porque prometeram me dar equity.'},
-{t:'o Otávio Serra',d:'semana passada',b:'Ele já era sócio antes da rodada, ninguém sabe disso além da Renata e eu.\nSe isso vazar, ele processa a empresa inteira.'},
-{t:'contar pra Aline?',d:'hoje, 23:50',b:'Eu não queria isso.\nSe ela publicar, eu perco tudo.\nSe eu contar a verdade primeiro, talvez sobre alguma coisa pra mim.'}
-];
-var VE=[
-{b:'Otávio Serra: sobre o valuation',x:'Espero que os números de amanhã reflitam o que conversamos. Não gosto de surpresas.',t:'terça'},
-{b:'Renata: sem rastros',x:'Apaga esse e-mail do dashboard. Nada de provas por escrito.',t:'quinta'}
-];
-var VG=[
-{b:'Áudio de Renata (encaminhado)',x:'«Quando a rodada fechar, ninguém mais vai perguntar de onde vieram os usuários. Relaxa.»',t:'quinta'}
-];
-var VP=[{e:'📸',t:'terça',c:'Print do dashboard real, sem o filtro. <b>Os números verdadeiros são 40% menores</b> que os apresentados aos investidores.'}];
-function openPin(){ openLock('vin','Celular do Miqueias','quatro números. Ele usa a mesma senha em tudo há anos.','0709', vhome); }
-function vhome(){
-  push('Celular do Miqueias','<div class="apps" style="padding:14px 18px">'+
-  [['💬','Mensagens','vmsg'],['📝','Notas','vnote'],['✉️','E-mail','vmail'],['🎙️','Gravador','vrec'],['🖼️','Fotos','vpic']].map(function(x){
-   return '<button class="app" onclick="'+x[2]+'()"><div class="icon">'+x[0]+'</div><span class="l">'+x[1]+'</span></button>';}).join('')+'</div>');
-}
-function vmsg(){push('Renata',chat(VM),'chat');}
-function vnote(){push('Notas',notes(VN));}
-function vmail(){push('E-mail',items(VE));}
-function vrec(){push('Gravador',items(VG));}
-function vpic(){push('Fotos','<div class="grid"><div class="ph" onclick="photoView(VP[0])">📸</div></div>');}
-
-/* ===================== SOLUÇÃO ===================== */
-function openSol(){
-  push('Solução','<div class="cap" style="padding:16px" id="sw">Só toque quando todo mundo já tiver votado. Não tem volta.<br><br><button class="btn" onclick="document.getElementById(\'st\').style.display=\'block\';document.getElementById(\'sw\').style.display=\'none\'">revelar solução</button></div>'+
-  '<div id="st" class="cap" style="display:none;padding:16px;line-height:1.7"><b>Vilões diretos: Renata e Miqueias.</b><br><br>Renata inflou os números de usuários da Vórtice pra fechar uma rodada de R$ 50 milhões e salvar a empresa da falência. Miqueias, o CTO, escondeu as contas fantasmas no dashboard em troca de equity. Quando Aline descobriu e ameaçou publicar tudo, Miqueias a chamou pra sala de servidores só pra recuperar o notebook dela — sem intenção de machucá-la, mas assustando-a o bastante pra ela fugir.<br><br><b>Inocentes:</b> Sophia (desconfiava e tentou avisar Aline), Eloh (jornalista aliada, recebia as provas) e Seu Nato (deixou a porta dos fundos aberta pra ajudar).<br><br><b>Final:</b> ninguém sequestrou a Aline. Ela desceu pela escada de emergência, atravessou a área de carga e pegou a van de entregas que sai do prédio toda noite, indo direto pra casa da Eloh. Está segura, com o notebook e as provas em mãos.<br><br><b>Mandante por trás de tudo:</b> Otávio Serra, o investidor. Ele já era sócio oculto da empresa antes da rodada e ameaçou Renata diretamente caso o valuation caísse. As provas disso ficam no Cofre, no fim da cadeia de senhas.<br><br><b>Pistas-chave:</b> filtro escondido no dashboard, contrato do aporte, escada de emergência, o crachá caído, gravações e o celular do Miqueias (senha 0709).</div>');
-}
-
-/* ===================== HOME ===================== */
-var APP=[
- ['💬','Mensagens',function(){push('Mensagens',rows(TH.map(function(x){return {a:x.a,c:x.c,n:x.n,p:x.p,t:x.t};}),'openTH'));},9],
- ['📝','Notas',function(){tryOpen('notas','Notas','quatro números. O dia em que ela completou um marco de carreira.','0306',function(){push('Notas',notes(NT));});},2,'notas'],
- ['📷','Instagram',function(){tryOpen('insta','Instagram','quatro números. Aniversário de alguém muito peludo e querido.','1402',openIG);},0,'insta'],
- ['✉️','E-mail',function(){tryOpen('email','E-mail','quatro números, dia e mês. Ligado à primeira vez que ela viu algo suspeito.','1008',function(){push('E-mail',items(EM));});},5,'email'],
- ['🖼️','Galeria',function(){tryOpen('galeria','Galeria','quatro números. A primeira reunião com um nome importante.','2103',function(){push('Galeria',photos(PH,'openPH'));});},0,'galeria'],
- ['📞','Ligações',function(){push('Ligações',rows([
-   {a:'M',c:'#4a5a6a',n:'Miqueias',p:'recebida · 3 min',t:'23:04'},
-   {a:'R',c:'#6a3a3a',n:'Renata',p:'perdida',r:1,t:'22:50'},
-   {a:'S',c:'#5a4a6a',n:'Sophia',p:'feita · 1 min',t:'23:14'},
-   {a:'E',c:'#5a6a4a',n:'Eloh',p:'feita · 2 min',t:'21:31'},
-   {a:'N',c:'#4a4a4a',n:'Seu Nato',p:'recebida · 0:20',t:'23:50'},
-   {a:'?',c:'#333',n:'Número desconhecido',p:'perdida',r:1,t:'23:55'}
- ],'void'));}],
- ['🔔','Redes',function(){push('Redes',items(SO));},3],
- ['📅','Agenda',function(){push('Agenda',items(AG));}],
- ['🎙️','Gravador',function(){tryOpen('grav','Gravador','quatro números. Não é uma data, é um ano.','2016',function(){push('Gravador',items(GR));});},4,'grav'],
- ['❤️','Saúde',function(){push('Saúde',items(SA));}],
- ['📍','Localização',function(){push('Localização',items(LO));}],
- ['🗝️','Cofre',function(){tryOpen('cofre','Cofre','quatro números. Um dia de novembro que ainda vai chegar.','1511',openCF);},0,'cofre'],
- ['🔒','Celular do Miqueias',openPin],
- ['🔍','Solução',openSol]
-];
-function renderApps(){
-  var c=document.getElementById('apps');c.innerHTML='';
-  APP.forEach(function(a){
-    var locked=a[4]&&!unlocked[a[4]];
-    var b=document.createElement('button');b.className='app';
-    var badge=locked?'<span class="badge" style="background:#555">🔒</span>':(a[3]?'<span class="badge">'+a[3]+'</span>':'');
-    b.innerHTML='<div class="icon">'+a[0]+badge+'</div><span class="l">'+a[1]+'</span>';
-    b.onclick=a[2];c.appendChild(b);
-  });
-}
-renderApps();
-function void0(){}
-window['void']=void0;
-</script>
 </body>
 </html>

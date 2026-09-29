@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O Celular da Yasmin</title>
+<style>
+:root{
+  --bg:#0b0e14; --ink:#e8edf2; --dim:#87909c; --panel:#141821; --panel2:#1b2029;
+  --accent:#57c2d6; --accent-dim:#2c6672; --alert:#d05a6e; --me:#1f4a52; --them:#1c2029;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+body{margin:0;min-height:100%;background:radial-gradient(ellipse at top,#141a24 0%,#06070a 70%);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);padding:24px 12px;}
+.frame{width:100%;max-width:380px;height:800px;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.7),inset 0 0 0 2px #2a2a2a;}
+.screen{width:100%;height:100%;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column;}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:60;}
+.lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:70px;background:linear-gradient(170deg,#1a2028 0%,#0b0e14 65%);z-index:50;transition:transform .35s ease;}
+.lock.hidden{transform:translateY(-100%);}
+.lock .time{font-size:58px;font-weight:600;letter-spacing:-1px;}
+.lock .date{font-size:15px;color:var(--dim);margin-top:4px;}
+.lock .warn{margin-top:26px;background:rgba(255,255,255,.07);border-radius:14px;padding:10px 14px;font-size:12px;color:var(--dim);width:82%;line-height:1.5;}
+.lock .hint{margin-top:auto;margin-bottom:30px;font-size:12.5px;color:var(--dim);text-align:center;padding:0 30px;}
+.btn{padding:13px 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:20px;color:var(--ink);font-size:14px;cursor:pointer;font-family:inherit;}
+.home{flex:1;display:flex;flex-direction:column;padding:44px 16px 14px;overflow-y:auto;}
+.status{font-size:11.5px;color:var(--dim);text-align:center;}
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px;margin-top:14px;}
+.app{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;color:var(--ink);font-family:inherit;cursor:pointer;}
+.icon{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:21px;position:relative;background:var(--panel2);}
+.badge{position:absolute;top:-4px;right:-4px;background:var(--alert);color:#fff;font-size:9.5px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.app span.l{font-size:9.5px;color:var(--dim);text-align:center;}
+.foot{margin-top:auto;text-align:center;font-size:11px;color:var(--dim);padding-top:12px;}
+.appscreen{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;z-index:30;}
+.appscreen.active{transform:translateX(0);}
+.topbar{display:flex;align-items:center;gap:10px;padding:52px 16px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:var(--panel);flex-shrink:0;}
+.back{background:none;border:none;color:var(--accent);font-size:20px;padding:0 8px 0 0;cursor:pointer;}
+.topbar h2{font-size:15px;margin:0;font-weight:600;}
+.list{flex:1;overflow-y:auto;padding:8px 0;}
+.list::-webkit-scrollbar,.chat::-webkit-scrollbar{display:none;}
+.row{display:flex;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}
+.av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
+.row .m{flex:1;min-width:0;}
+.row .n{font-size:13.5px;font-weight:600;}
+.row .p{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .p.red{color:var(--alert);}
+.row .t{font-size:10.5px;color:var(--dim);align-self:flex-start;}
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;}
+.b{max-width:80%;padding:8px 12px;border-radius:16px;font-size:13px;line-height:1.4;}
+.b.t{align-self:flex-start;background:var(--them);border-bottom-left-radius:4px;}
+.b.m{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px;}
+.b.c{box-shadow:0 0 0 1px var(--accent-dim);}
+.st{font-size:9.5px;color:var(--dim);text-align:center;margin:4px 0;}
+.who{font-size:10.5px;color:var(--accent);margin-bottom:-4px;margin-left:2px;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;}
+.ph{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--panel2);cursor:pointer;}
+.pv{padding:16px;}
+.big{width:100%;aspect-ratio:4/5;background:var(--panel2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:14px;}
+.cap{font-size:12.5px;color:var(--dim);line-height:1.6;}
+.cap b{color:var(--ink);}
+.note{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.note .nt{font-size:13.5px;font-weight:600;margin-bottom:3px;}
+.note .nd{font-size:10.5px;color:var(--dim);margin-bottom:7px;}
+.note .nb{font-size:12.5px;color:#d9dee2;line-height:1.6;white-space:pre-line;}
+.it{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px;line-height:1.55;}
+.it b{color:var(--accent);}
+.it .tm{font-size:10.5px;color:var(--dim);margin-top:4px;}
+.it .body{margin-top:6px;color:#d9dee2;}
+.pinw{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:40px;}
+.dots{display:flex;gap:14px;margin:18px 0 26px;}
+.dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--dim);}
+.dot.on{background:var(--accent);border-color:var(--accent);}
+.keys{display:grid;grid-template-columns:repeat(3,70px);gap:14px;}
+.key{height:60px;border-radius:50%;background:var(--panel2);border:none;color:var(--ink);font-size:22px;font-family:inherit;cursor:pointer;}
+.key.x{background:none;cursor:default;}
+.shake{animation:sh .35s;}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
+</head>
+<body>
+<div class="frame"><div class="screen" id="scr">
+<div class="notch"></div>
+<div class="lock" id="lock">
+  <div class="time">21:36</div>
+  <div class="date">sexta-feira, 6 de dezembro</div>
+  <div class="warn">⚡ Queda de energia no estúdio durante a live beneficente "Um Novo Lar". Transmissão caiu aos 21:29.</div>
+  <div class="hint">celular achado atrás do sofá do estúdio. Sem senha: ela nunca trancava.</div>
+  <button class="btn" onclick="document.getElementById('lock').classList.add('hidden')">desbloquear ↑</button>
+</div>
+<div class="home">
+  <div class="status">Yasmin Rocha, 23, criadora de conteúdo · desaparecida desde as 21:34</div>
+  <div class="apps" id="apps"></div>
+  <div class="foot">bateria 5% · Capítulo 4 de 6</div>
+</div>
+</div></div>
+
+<script>
+var scr=document.getElementById('scr'),stack=[],cur='';
+function push(title,html,cls){
+  var d=document.createElement('div');d.className='appscreen';
+  d.innerHTML='<div class="topbar"><button class="back">‹</button><h2>'+title+'</h2></div><div class="'+(cls||'list')+'">'+html+'</div>';
+  d.querySelector('.back').onclick=pop;scr.appendChild(d);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('active');});});
+  stack.push(d);return d;
+}
+function pop(){var d=stack.pop();if(!d)return;d.classList.remove('active');setTimeout(function(){d.remove();},300);}
+var unlocked={},lockCtx=null;
+function openLock(id,title,hint,password,onSuccess){
+  cur='';var k='';
+  for(var i=1;i<=9;i++)k+='<button class="key" onclick="pinTry('+i+')">'+i+'</button>';
+  k+='<button class="key x"></button><button class="key" onclick="pinTry(0)">0</button><button class="key" onclick="pinDelG()">⌫</button>';
+  lockCtx={password:password,onSuccess:onSuccess,id:id};
+  push(title,'<div style="font-size:15px">Digite a senha</div><div class="cap" style="text-align:center;padding:6px 30px 0">'+hint+'</div><div class="dots" id="dotsG"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="keys">'+k+'</div>','pinw');
+}
+function pinTry(n){
+  if(cur.length>=4)return;cur+=n;dotsG();
+  if(cur.length===4){setTimeout(function(){
+    if(cur===lockCtx.password){unlocked[lockCtx.id]=true;pop();cur='';renderApps();lockCtx.onSuccess();}
+    else{var d=document.getElementById('dotsG');d.classList.add('shake');setTimeout(function(){d.classList.remove('shake');cur='';dotsG();},400);}
+  },200);}
+}
+function pinDelG(){cur=cur.slice(0,-1);dotsG();}
+function dotsG(){var e=document.querySelectorAll('#dotsG .dot');for(var i=0;i<e.length;i++)e[i].classList.toggle('on',i<cur.length);}
+function tryOpen(id,title,hint,password,fn){ if(unlocked[id]) fn(); else openLock(id,title,hint,password,fn); }
+
+var K={t:'b t',m:'b m',T:'b t c',M:'b m c'};
+function chat(a){return a.map(function(x){
+  if(x[0]==='s')return '<div class="st">'+x[1]+'</div>';
+  return (x[2]?'<div class="who">'+x[2]+'</div>':'')+'<div class="'+K[x[0]]+'">'+x[1]+'</div>';}).join('');}
+function rows(a,fn){return a.map(function(x,i){
+  return '<div class="row" onclick="'+fn+'('+i+')"><div class="av" style="background:'+x.c+'">'+x.a+'</div><div class="m"><div class="n">'+x.n+'</div><div class="p '+(x.r?'red':'')+'">'+x.p+'</div></div><div class="t">'+x.t+'</div></div>';}).join('');}
+function notes(a){return a.map(function(x){
+  return '<div class="note"><div class="nt">'+x.t+'</div><div class="nd">'+x.d+'</div><div class="nb">'+x.b+'</div></div>';}).join('');}
+function items(a){return a.map(function(x){
+  return '<div class="it"><b>'+x.b+'</b>'+(x.x?'<div class="body">'+x.x+'</div>':'')+'<div class="tm">'+x.t+'</div></div>';}).join('');}
+function photos(a,fn){return '<div class="grid">'+a.map(function(x,i){return '<div class="ph" onclick="'+fn+'('+i+')">'+x.e+'</div>';}).join('')+'</div>';}
+function photoView(x){push(x.t,'<div class="big">'+x.e+'</div><div class="cap">'+x.c+'</div>','list pv');}
+
+/* ===================== CELULAR DA YASMIN ===================== */
+var TH=[
+{a:'🐾',c:'#2a3a3f',n:'Equipe Live Um Novo Lar',p:'Théo: caiu tudo, alguém viu a Yasmin?',t:'21:32',m:[
+ ['t','a transmissão caiu, tá todo mundo perguntando no chat','Fernanda'],['t','o disjuntor do estúdio inteiro desarmou sozinho','Ricardo'],
+ ['t','isso nunca aconteceu nesse estúdio antes','Théo'],['t','cadê a Yasmin? ela foi ver o quadro de luz e não voltou','Bianca'],
+ ['t','caiu tudo, alguém viu a Yasmin?','Théo'],['s','21:32 · 5 pessoas']]},
+{a:'R',c:'#4a3a2a',n:'Ricardo (empresário)',p:'guarda essa dúvida pra depois da live',t:'20:10',m:[
+ ['t','Precisamos conversar sobre os relatórios das doações antes da live de hoje.'],
+ ['m','Os números fecham? Vi uma diferença estranha ontem.'],
+ ['T','Guarda essa dúvida pra depois da live, Yasmin. Hoje é dia de arrecadar, não de brigar por planilha.'],
+ ['m','Ricardo, isso é dinheiro do abrigo. Preciso ter certeza.'],
+ ['T','Confia em mim. Amanhã eu te mostro tudo com calma.'],
+ ['s','20:10 · lida']]},
+{a:'F',c:'#3a2a4a',n:'Fernanda (financeiro)',p:'melhor deixar isso pra depois da meta batida',t:'19:20',m:[
+ ['t','Yasmin, sobre a planilha que você pediu: melhor deixar isso pra depois da meta ser batida hoje.'],
+ ['m','Por que tanto mistério com uma planilha, Fê?'],
+ ['T','Não é mistério, é organização. Hoje é um dia importante, vamos focar na live.'],
+ ['m','Vocês dois estão estranhos essa semana.'],
+ ['t','Imaginação sua. Boa live hoje!'],
+ ['s','19:20 · lida']]},
+{a:'T',c:'#2a4a3a',n:'Théo (editor/namorado)',p:'não fala nada até eu te mostrar uma coisa',t:'21:00',m:[
+ ['t','Preciso te mostrar uma coisa antes da live, é sério.'],
+ ['m','Fala rápido, vou entrar ao vivo em 20 minutos.'],
+ ['T','Os valores que aparecem na tela pra doação não batem com o extrato da conta do abrigo. Faltam quase 80 mil.'],
+ ['m','Isso não pode ser verdade.'],
+ ['T','Não fala nada até eu te mostrar os prints direito. Te encontro na sala de equipamento assim que puder.'],
+ ['m','Tá bem, assim que a luz da abertura passar eu vou até lá.'],
+ ['s','21:00 · entregue']]},
+{a:'B',c:'#4a2a3a',n:'Bianca (co-apresentadora)',p:'lembra do dia que a Mel foi resgatada?',t:'18:30',m:[
+ ['t','Hoje vai bombar, sinto no ar!'],
+ ['m','Espero que sim, é pela Mel e por todos os outros bichinhos do abrigo 💛'],
+ ['t','Lembra do dia que a Mel foi resgatada? 11 de maio, vocês duas mudaram a vida uma da outra.'],
+ ['m','Nunca esqueço essa data. Foi o início de tudo isso.'],
+ ['t','Boa live, amiga. Você merece todo esse sucesso.'],
+ ['s','18:30 · lida']]},
+{a:'A',c:'#3a3a3a',n:'Seu Adilson (portaria)',p:'deixei a porta dos fundos destrancada',t:'21:31',m:[
+ ['t','Dona Yasmin, a senhora está bem? Ouvi um barulho estranho na sala de equipamento.'],
+ ['T','Vi o Ricardo saindo correndo pela escada, sozinho, uns minutos atrás.'],
+ ['t','Deixei a porta dos fundos destrancada, caso a senhora precise sair sem ser vista.'],
+ ['s','21:31 · entregue']]}
+];
+function openTH(i){push(TH[i].n,chat(TH[i].m),'chat');}
+
+var PH=[
+{e:'📊',t:'20:40',c:'Print do painel de doações. <b>O total mostrado na tela é R$ 80 mil maior</b> do que o extrato real da conta do abrigo.'},
+{e:'📈',t:'20:00',c:'Gráfico de uma corretora de criptomoedas com perdas enormes numa conta ligada ao nome do Ricardo.'},
+{e:'🖥️',t:'21:10',c:'Foto tremida da sala de equipamento. <b>Fernanda copiando arquivos pra um pen drive</b>, sem perceber a câmera aberta.'},
+{e:'📄',t:'20:50',c:'Print de um contrato antigo do abrigo com o "Grupo Aurora Investimentos" como parceiro financeiro.'},
+{e:'🪜',t:'21:33',c:'Escada de serviço do prédio, foto escura. <b>Uma silhueta descendo às pressas</b>, minutos após o apagão.'},
+{e:'🐕',t:'11/05',c:'Foto do dia da adoção da Mel, sua cadela. Legenda: <b>«11 de maio, o dia que tudo mudou pra melhor»</b>.'},
+{e:'👶',t:'09/01',c:'Foto da sobrinha Duda soprando velinhas. Legenda: <b>«minha sobrinha favorita fazendo 5 aninhos, 9 de janeiro»</b>.'},
+{e:'🏠',t:'antiga',c:'Foto de uma placa na entrada do abrigo: <b>«Abrigo Novo Lar — fundado em 1998»</b>.'},
+{e:'💻',t:'21:20',c:'Print de uma conversa apagada entre Ricardo e alguém salvo como «Kadu (NÃO FALAR NA FRENTE DELA)».'}
+];
+function openPH(i){photoView(PH[i]);}
+
+var NT=[
+{t:'os números da live não fecham',d:'ontem',b:'faltam quase 80 mil no total arrecadado esse ano\no Ricardo desconversa toda vez que eu pergunto\nvou confrontar ele direito hoje, antes ou depois da live'},
+{t:'senha do Insta (perfil real)',d:'mês passado',b:'uso a data que adotei a Mel nesse perfil que só uso pra desabafar\n11 de maio\nnem minha equipe segue esse perfil'},
+{t:'Ricardo e as senhas dele',d:'faz tempo',b:'ele sempre usa o ano que abriu a empresa dele, com muito orgulho\n2004\nfala isso toda entrevista que dá'},
+{t:'quem ganha com isso',d:'hoje',b:'1. Ricardo: cobre um rombo antes que alguém descubra\n2. Fernanda: protege o Ricardo, mas por quê?\n3. quem é esse "Kadu"?'},
+{t:'plano pra depois da abertura',d:'hoje, 21:05',b:'vou até a sala de equipamento falar com o Théo\nse for verdade, confronto o Ricardo ainda hoje, ao vivo se precisar\nnão vou deixar o nome do abrigo ser usado assim'}
+];
+
+var IGM=[
+ ['t','Vi sua mensagem, o que você descobriu sobre os valores?','Théo'],
+ ['m','40% do que aparece na tela não existe na conta real do abrigo.'],
+ ['T','Eu suspeitava. Vi o Ricardo mexendo numa conta de criptomoeda semana passada.','Théo'],
+ ['m','Vou confrontar ele hoje, com ou sem câmera ligada.'],
+ ['T','Cuidado. Mudei a senha do meu e-mail de trabalho pra data que vi a primeira inconsistência nos números, 17 de julho.','Théo'],
+ ['m','1707. Vou anotar isso em algum lugar seguro.'],
+ ['t','Boa live. Você é mais forte do que imagina.','Théo']
+];
+function openIG(){push('Instagram · @yasmin.de.verdade (privado)',chat(IGM),'chat');}
+
+var DO=[
+{b:'Meta da live',x:'R$ 150 mil pro abrigo Novo Lar. Placar ao vivo mostra 92% atingido às 21:00.',t:'hoje'},
+{b:'Extrato real do abrigo',x:'Saldo disponível é R$ 80 mil menor do que o total anunciado nas últimas três lives.',t:'hoje'},
+{b:'Transferência suspeita',x:'Uma saída de R$ 45 mil em 28 de junho, categorizada como «taxas administrativas», sem nota fiscal.',t:'quinta'},
+{b:'Lembrete pra mim mesma',x:'Mudei a senha do e-mail institucional pra data dessa transferência de 28 de junho — não posso esquecer isso.',t:'quinta'},
+{b:'Anotação da Fernanda (print)',x:'«resolver com o Kadu antes do fechamento do trimestre, em dezembro, ou o rombo aparece na auditoria»',t:'terça'}
+];
+function openDO(){push('Doações — painel financeiro',items(DO));}
+
+var EM=[
+{b:'Abrigo Novo Lar: agradecimento',x:'Obrigado pela parceria contínua e pela live de hoje. Contamos com vocês.',t:'hoje, 08:00'},
+{b:'Ricardo: sobre a planilha',x:'Vamos alinhar o discurso da live antes de qualquer coisa. Me chama.',t:'hoje, 14:00'},
+{b:'Fernanda: confidencial',x:'O que conversamos ontem fica entre nós até resolvermos com o Kadu.',t:'ontem, 20:00'},
+{b:'Rascunho: pra denunciar',x:'«Como uma live beneficente pode estar escondendo um rombo de 80 mil»',t:'rascunho'},
+{b:'Lembrete pra mim mesma',x:'Mudei a senha da galeria pra data do aniversário do canal, 3 de setembro, meu marco favorito.',t:'quinta'}
+];
+
+var AG=[
+{b:'Live Um Novo Lar',x:'20h às 22h, estúdio principal.',t:'hoje'},
+{b:'Conversa com o Théo',x:'21h10, sala de equipamento, assim que a abertura da live passar.',t:'hoje'},
+{b:'Reunião com investidores do Grupo Aurora',x:'Marcada pra semana que vem, adiada duas vezes pelo Ricardo.',t:'próxima semana'},
+{b:'Fechamento do trimestre',x:'Dezembro. Anotação: «se o rombo não for coberto até lá, aparece na auditoria externa».',t:'dezembro'},
+{b:'Prazo do Kadu',x:'Anotação num post-it: «resolve isso até dia 05, ou eu resolvo sozinho».',t:'dia 05'}
+];
+
+var GR=[
+{b:'Gravador 1',x:'Transcrição: «...se isso aparecer na auditoria, a culpa cai toda em cima de você, não minha...» (voz de Kadu, ao telefone, ouvida sem querer)',t:'terça'},
+{b:'Gravador 2',x:'Transcrição: «Fernanda, eu preciso resolver isso antes da live de hoje, não dá mais pra esperar.» (voz de Ricardo)',t:'hoje, 18:50'},
+{b:'Gravador 3',x:'Transcrição: passos apressados no corredor, uma porta batendo, depois só o som do gerador tentando ligar.',t:'hoje, 21:30'},
+{b:'Gravador 4 (oculto)',x:'Transcrição: «...a transferência final pro Kadu sai dia 05, sem falta, antes do fechamento...» (voz de Ricardo, ao telefone)',t:'hoje, 19:40'}
+];
+
+var SA=[
+{b:'Passos',x:'De 21:25 a 21:34: 310 passos, do estúdio principal até a sala de equipamento e depois até a escada de serviço.',t:'hoje'},
+{b:'Batimentos',x:'Pico de 146 bpm às 21:31. Cai pra 94 bpm às 21:35, como se o perigo tivesse ficado pra trás.',t:'hoje'},
+{b:'Última atividade',x:'21:34: celular parado atrás do sofá até ser encontrado pela Bianca às 21:50.',t:'hoje'}
+];
+
+var LO=[
+{b:'20:00',x:'Estúdio principal (abertura da live)',t:'hoje'},
+{b:'20:45',x:'Sala da Fernanda, 6 minutos',t:'hoje'},
+{b:'21:10',x:'Sala de equipamento, com o Théo',t:'hoje'},
+{b:'21:29',x:'Quadro de luz, no corredor',t:'hoje'},
+{b:'21:34',x:'Escada de serviço. Depois disso o celular não se move mais.',t:'hoje'},
+{b:'21:50',x:'Celular encontrado pela Bianca, atrás do sofá do estúdio',t:'hoje'}
+];
+
+var SO=[
+{b:'Ricardo',x:'apagou um story às 21:05: «hoje precisa dar tudo certo»',t:'hoje'},
+{b:'Fernanda',x:'postou nos stories: «meta batida, obrigada a todos!» às 20:58, antes mesmo da meta real ser atingida',t:'hoje'},
+{b:'Théo',x:'comentou numa foto antiga sua: «cuidado com quem te cerca hoje»',t:'hoje, 20:55'},
+{b:'Perfil «kadu_investe»',x:'começou a seguir o Ricardo essa semana, sem foto, sem posts',t:'quarta'}
+];
+
+var LIVE=[
+{b:'chat_fan_02',x:'gente caiu a transmissão??',t:'21:29'},
+{b:'AmoAnimais_rj',x:'a live tava tão boa, volta logooo',t:'21:29'},
+{b:'chat_fan_88',x:'a meta ainda não bateu 100%, será que doamos mais?',t:'21:30'},
+{b:'Théo_edicao',x:'pessoal, problema técnico, já resolvemos',t:'21:31'},
+{b:'chat_fan_02',x:'cadê a Yasmin? o Ricardo tá sozinho no palco',t:'21:33'}
+];
+
+var CF=[
+{t:'Quem é o Kadu',x:'Kadu Ferraz, um "trader" de criptomoedas que convenceu o Ricardo a investir parte das doações num projeto que prometia dobrar o dinheiro rápido.'},
+{t:'O rombo real',x:'O investimento quebrou. Faltam R$ 80 mil no fundo do abrigo. Ricardo, desesperado, pediu ajuda a Fernanda pra maquiar os relatórios até conseguir repor.'},
+{t:'Por que a Fernanda ajudou',x:'Documentos mostram que ela também investiu dinheiro próprio no mesmo esquema, por indicação do Ricardo, e perdeu tudo junto com ele.'},
+{t:'Pra onde a Yasmin foi',x:'Ela saiu pela porta dos fundos que o Seu Adilson deixou destrancada e foi direto pra casa da Bianca, com prints e gravações suficientes pra expor tudo com segurança.'}
+];
+function openCF(){push('Nuvem — backup automático',items(CF));}
+
+/* ===================== CELULAR DO RICARDO ===================== */
+var VM=[
+ ['s','duas semanas atrás'],['t','Se isso não for resolvido logo, vai aparecer na auditoria de vocês.','Kadu'],
+ ['m','Vou repor o quanto antes, só preciso de mais um pouco de tempo.'],['T','Não tenho paciência infinita.','Kadu'],
+ ['s','hoje, 18:45'],['T','Fernanda, preciso resolver isso antes da live de hoje.','eu → Fernanda'],['M','Tá bem, mas essa é a última vez que eu maquio um relatório pra você.','Fernanda'],
+ ['t','Prometo. Depois da live eu conto tudo pra Yasmin com calma.'],
+ ['s','21:20'],['M','A Yasmin descobriu. Ela foi falar com o Théo.'],['T','Vai atrás dela. Não deixa isso estourar ao vivo.','Fernanda']
+];
+var VN=[
+{t:'o investimento com o Kadu',d:'2 meses atrás',b:'Perdi muito mais do que imaginava numa jogada que parecia segura.\nA Fernanda topou ajudar a esconder, mas ela também perdeu dinheiro nisso.'},
+{t:'senha de tudo',d:'faz tempo',b:'Uso sempre o ano que abri minha primeira empresa.\n2004.\nFalo isso em toda entrevista, sem imaginar que um dia seria problema.'},
+{t:'contar pra Yasmin?',d:'hoje, 21:15',b:'Eu não queria que ela descobrisse assim, no dia da live mais importante do ano.\nSe ela me demitir, eu mereço.\nMas juro que nunca deixaria ninguém fazer mal a ela.'}
+];
+var VE=[
+{b:'Kadu: prazo final',x:'Dia 05. Sem mais prorrogação. Você sabe o que acontece com quem me deve.',t:'segunda'},
+{b:'Fernanda: sem provas',x:'Apague qualquer conversa sobre o investimento. Isso não pode aparecer em lugar nenhum.',t:'quinta'}
+];
+var VG=[
+{b:'Áudio de Fernanda (encaminhado)',x:'«Depois que o Kadu receber, ninguém mais vai mexer nisso. Foca na live e relaxa.»',t:'quinta'}
+];
+var VP=[{e:'📸',t:'terça',c:'Print do extrato mostrando a transferência de 45 mil pro Kadu, escondida numa conta que não é a do abrigo.'}];
+function openPin(){ openLock('ric','Celular do Ricardo','quatro números. Um ano que ele repete com orgulho em toda entrevista.','2004', vhome); }
+function vhome(){
+  push('Celular do Ricardo','<div class="apps" style="padding:14px 18px">'+
+  [['💬','Mensagens','vmsg'],['📝','Notas','vnote'],['✉️','E-mail','vmail'],['🎙️','Gravador','vrec'],['🖼️','Fotos','vpic']].map(function(x){
+   return '<button class="app" onclick="'+x[2]+'()"><div class="icon">'+x[0]+'</div><span class="l">'+x[1]+'</span></button>';}).join('')+'</div>');
+}
+function vmsg(){push('Kadu / Fernanda',chat(VM),'chat');}
+function vnote(){push('Notas',notes(VN));}
+function vmail(){push('E-mail',items(VE));}
+function vrec(){push('Gravador',items(VG));}
+function vpic(){push('Fotos','<div class="grid"><div class="ph" onclick="photoView(VP[0])">📸</div></div>');}
+
+/* ===================== SOLUÇÃO ===================== */
+function openSol(){
+  push('Solução','<div class="cap" style="padding:16px" id="sw">Só toque quando todo mundo já tiver votado. Não tem volta.<br><br><button class="btn" onclick="document.getElementById(\'st\').style.display=\'block\';document.getElementById(\'sw\').style.display=\'none\'">revelar solução</button></div>'+
+  '<div id="st" class="cap" style="display:none;padding:16px;line-height:1.7"><b>Vilões diretos: Ricardo e Fernanda.</b><br><br>Ricardo investiu parte das doações do abrigo num esquema de criptomoedas indicado por Kadu Ferraz e perdeu R$ 80 mil. Desesperado, pediu ajuda a Fernanda, que maquiou os relatórios financeiros pra esconder o rombo até conseguir repor o dinheiro. Quando Yasmin descobriu no dia da live mais importante do ano, os dois tentaram convencê-la a esperar.<br><br><b>Inocentes:</b> Théo (avisou Yasmin a tempo), Bianca (só queria ver a live dar certo) e Seu Adilson (ajudou deixando a porta destrancada).<br><br><b>Final:</b> ninguém machucou a Yasmin. Ela saiu pela porta dos fundos e foi direto pra casa da Bianca, com provas suficientes pra expor tudo com segurança.<br><br><b>Mandante por trás de tudo:</b> Kadu Ferraz, o "trader" que convenceu Ricardo a investir o dinheiro do abrigo e depois o pressionou a repor o valor rapidamente. As provas completas ficam na Nuvem, no fim da cadeia de senhas.<br><br><b>Sobre a senha da Nuvem:</b> ela combina duas pistas de apps diferentes — o dia (05) vem do Gravador, e o mês (dezembro, 12) vem do painel de Doações.<br><br><b>Pistas-chave:</b> painel de doações inflado, gráfico de perdas em cripto, gravações, escada de serviço e o celular do Ricardo (senha 2004).</div>');
+}
+
+/* ===================== HOME ===================== */
+var APP=[
+ ['💬','Mensagens',function(){push('Mensagens',rows(TH.map(function(x){return {a:x.a,c:x.c,n:x.n,p:x.p,t:x.t};}),'openTH'));},9],
+ ['📝','Notas',function(){tryOpen('notas','Notas','quatro números. O dia em que ela adotou alguém muito peludo.','1105',function(){push('Notas',notes(NT));});},2,'notas'],
+ ['📷','Instagram',function(){tryOpen('insta','Instagram','quatro números. Aniversário de uma criança da família.','0901',openIG);},0,'insta'],
+ ['🐾','Doações',function(){tryOpen('doa','Doações','quatro números. O dia em que ela viu a primeira inconsistência.','1707',openDO);},0,'doa'],
+ ['✉️','E-mail',function(){tryOpen('email','E-mail','quatro números, dia e mês. Ligado a uma transferência suspeita.','2806',function(){push('E-mail',items(EM));});},5,'email'],
+ ['🖼️','Galeria',function(){tryOpen('galeria','Galeria','quatro números. O aniversário do canal dela.','0309',function(){push('Galeria',photos(PH,'openPH'));});},0,'galeria'],
+ ['📺','Live',function(){push('Live — chat da transmissão',items(LIVE));}],
+ ['📞','Ligações',function(){push('Ligações',rows([
+   {a:'T',c:'#2a4a3a',n:'Théo',p:'recebida · 5 min',t:'21:00'},
+   {a:'R',c:'#4a3a2a',n:'Ricardo',p:'perdida',r:1,t:'20:15'},
+   {a:'F',c:'#3a2a4a',n:'Fernanda',p:'feita · 2 min',t:'19:22'},
+   {a:'A',c:'#3a3a3a',n:'Seu Adilson',p:'recebida · 0:15',t:'21:31'},
+   {a:'?',c:'#333',n:'Número desconhecido',p:'perdida',r:1,t:'21:36'}
+ ],'void'));}],
+ ['🔔','Redes',function(){push('Redes',items(SO));},3],
+ ['📅','Agenda',function(){push('Agenda',items(AG));}],
+ ['🎙️','Gravador',function(){tryOpen('grav','Gravador','quatro números. Não é uma data, é um ano bem antigo.','1998',function(){push('Gravador',items(GR));});},4,'grav'],
+ ['❤️','Saúde',function(){push('Saúde',items(SA));}],
+ ['📍','Localização',function(){push('Localização',items(LO));}],
+ ['☁️','Nuvem',function(){tryOpen('nuvem','Nuvem','quatro números. Junte duas pistas: um dia do Gravador e um mês das Doações.','0512',openCF);},0,'nuvem'],
+ ['🔒','Celular do Ricardo',openPin],
+ ['🔍','Solução',openSol]
+];
+function renderApps(){
+  var c=document.getElementById('apps');c.innerHTML='';
+  APP.forEach(function(a){
+    var locked=a[4]&&!unlocked[a[4]];
+    var b=document.createElement('button');b.className='app';
+    var badge=locked?'<span class="badge" style="background:#555">🔒</span>':(a[3]?'<span class="badge">'+a[3]+'</span>':'');
+    b.innerHTML='<div class="icon">'+a[0]+badge+'</div><span class="l">'+a[1]+'</span>';
+    b.onclick=a[2];c.appendChild(b);
+  });
+}
+renderApps();
+function void0(){}
+window['void']=void0;
+</script>
+</body>
+</html>
