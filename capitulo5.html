@@ -11,8 +11,8 @@ html,body{min-height:100%;}
 body{margin:0;background:radial-gradient(ellipse at top,#1c1522 0%,#08060a 70%);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);padding:24px 12px;}
 .frame{width:100%;max-width:380px;height:800px;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.7),inset 0 0 0 2px #2a2a2a;}
 .screen{width:100%;height:100%;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column;}
-.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:110;}
-.toast{position:absolute;top:32px;left:8px;right:8px;background:rgba(22,17,22,.94);backdrop-filter:blur(6px);border-radius:16px;padding:10px 12px;display:flex;gap:10px;align-items:center;z-index:100;transform:translateY(-160%);transition:transform .35s ease;box-shadow:0 10px 30px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.06);}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:110;pointer-events:none;}
+.toast{position:absolute;top:32px;left:8px;right:8px;background:rgba(22,17,22,.96);backdrop-filter:blur(6px);border-radius:16px;padding:10px 12px;display:flex;gap:10px;align-items:center;z-index:120;transform:translateY(-160%);transition:transform .35s ease;box-shadow:0 10px 30px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.06);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .toast.show{transform:translateY(0);}
 .toast .tav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
 .toast .tt{flex:1;min-width:0;}
@@ -118,7 +118,13 @@ function push(title,html,cls){
   requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('active');});});
   stack.push(d);return d;
 }
-function pop(){var d=stack.pop();if(!d)return;if(d._th){openTh=-1;chatEl=null;}d.classList.remove('active');setTimeout(function(){d.remove();},300);}
+function pop(){
+  var d=stack.pop();if(!d)return;
+  d.classList.remove('active');setTimeout(function(){d.remove();},300);
+  /* se voltou pra outro chat aberto, continua sabendo qual é */
+  var top=stack[stack.length-1];
+  if(top&&top._th){openTh=top._ti;chatEl=top.lastChild;}else{openTh=-1;chatEl=null;}
+}
 var unlocked={},lockCtx=null;
 function openLock(id,title,hint,password,onSuccess){
   cur='';var k='';
@@ -159,18 +165,43 @@ function showToast(){
   if(!toastsOn||ni>=NOTIFS.length)return;
   var n=NOTIFS[ni],i=n.th;ni++;
   if(i==='u'){if(!UNK.on){UNK.on=1;TH.push(UNK);}i=TH.indexOf(UNK);}
-  var t=TH[i],live=(openTh===i&&chatEl),typ=null;
-  if(live){typ=document.createElement('div');typ.className='b t typ';typ.innerHTML='<span class="tp"><i></i><i></i><i></i></span>';chatEl.appendChild(typ);chatEl.scrollTop=1e5;}
+  var t=TH[i],typ=null,done=false,timer=null;
+
+  /* se esse chat já está aberto, mostra "digitando…" dentro dele */
+  if(openTh===i&&chatEl){
+    typ=document.createElement('div');typ.className='b t typ';
+    typ.innerHTML='<span class="tp"><i></i><i></i><i></i></span>';
+    chatEl.appendChild(typ);chatEl.scrollTop=1e5;
+  }
+
   var d=document.createElement('div');d.className='toast';
   d.innerHTML='<div class="tav" style="background:'+n.c+'">'+n.a+'</div><div class="tt"><div class="tn">'+n.n+'</div><div class="tm"><span class="tp"><i></i><i></i><i></i></span> digitando</div></div>';
   scr.appendChild(d);
   requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('show');});});
-  setTimeout(function(){
+
+  /* entrega a mensagem (sozinha depois de uns segundos, ou na hora se você tocar) */
+  function deliver(){
+    if(done)return;done=true;clearTimeout(timer);
     t.m.push(['t',n.m]);t.p=n.m;t.t=clock();
-    d.querySelector('.tm').textContent=n.m;
-    if(live&&openTh===i){typ.className='b t';typ.textContent=n.m;chatEl.scrollTop=1e5;}
-    else{if(typ)typ.remove();t.u=(t.u||0)+1;renderApps();}
-  },2200+Math.random()*1200);
+    var tm=d.querySelector('.tm');if(tm)tm.textContent=n.m;
+    if(openTh===i&&chatEl){
+      if(typ&&typ.parentNode){typ.className='b t';typ.textContent=n.m;}
+      else{var bb=document.createElement('div');bb.className='b t';bb.textContent=n.m;chatEl.appendChild(bb);}
+      chatEl.scrollTop=1e5;
+    }else{
+      if(typ&&typ.parentNode)typ.remove();
+      t.u=(t.u||0)+1;renderApps();
+    }
+  }
+  timer=setTimeout(deliver,2200+Math.random()*1200);
+
+  /* TOCAR NA NOTIFICAÇÃO → abre a conversa onde a pessoa mandou a mensagem */
+  d.onclick=function(){
+    deliver();
+    d.classList.remove('show');setTimeout(function(){d.remove();},400);
+    if(openTh!==i)openTH(i);
+  };
+
   setTimeout(function(){d.classList.remove('show');setTimeout(function(){d.remove();},400);},6600);
   setTimeout(showToast,14000+Math.random()*8000);
 }
@@ -238,7 +269,11 @@ var TH=[
  ['T','Um homem de terno escuro perguntou pela senhora no estacionamento. Não deu o nome.'],
  ['s','23:11 · entregue']]}
 ];
-function openTH(i){var t=TH[i];t.u=0;renderApps();var d=push(t.n,chat(t.m),'chat');d._th=1;openTh=i;chatEl=d.lastChild;chatEl.scrollTop=1e5;}
+function openTH(i){
+  var t=TH[i];t.u=0;renderApps();
+  var d=push(t.n,chat(t.m),'chat');
+  d._th=1;d._ti=i;openTh=i;chatEl=d.lastChild;chatEl.scrollTop=1e5;
+}
 
 var PH=[
 {e:'📊',t:'21:00',c:'Print do contrato de royalties. <b>O valor pago pelo selo é R$ 70 mil menor</b> do que o combinado originalmente.'},
@@ -247,7 +282,7 @@ var PH=[
 {e:'📄',t:'21:10',c:'Print de um contrato antigo com o "Selo Máxima" e o nome de Fábio Andrade como diretor responsável.'},
 {e:'🪜',t:'23:13',c:'Corredor dos fundos do teatro, foto escura. <b>Uma silhueta saindo às pressas</b>, minutos após o apagão.'},
 {e:'🎤',t:'20/05',c:'Foto do primeiro show da banda, num bar quase vazio. Legenda: <b>«começamos aqui, olha até onde chegamos»</b>.'},
-{e:'🐈',t:'antiga',c:'Foto do gato dela, Prince, com um chapéu de festa. Legenda: <b>«o rei da casa faz aniversário no fim do ano»</b>.'},
+{e:'🐈',t:'antiga',c:'Foto do gato dela, Prince, com um chapéu de festa. Legenda: <b>«o rei da casa faz aniversário em 8 de dezembro»</b>.'},
 {e:'🏢',t:'antiga',c:'Foto de uma placa na entrada do selo: <b>«Selo Máxima — fundado em 2011»</b>.'},
 {e:'📱',t:'22:40',c:'Print de conversa apagada entre Marcelo e alguém salvo como «Fábio Andrade (NÃO FALAR NA FRENTE DELA)».'},
 {e:'💿',t:'agosto',c:'Contracapa do álbum "Rosa Elétrica" pronta pra gráfica. Lista de músicas: <b>doze faixas</b>, da primeira à última. Anotado a caneta ao lado: <b>«a nº 1 eu escrevo no camarim, sozinha»</b>.'}
@@ -256,7 +291,7 @@ function openPH(i){photoView(PH[i]);}
 
 var NT=[
 {t:'os royalties não fecham',d:'ontem',b:'faltam quase 70 mil no que o selo pagou pela turnê\no Marcelo desconversa toda vez que eu pergunto\nvou confrontar ele direito hoje, antes ou depois do show'},
-{t:'senha do Insta (perfil real)',d:'mês passado',b:'é aquele perfil que só uso pra desabafar\nsenha = dia e mês do aniversário de quem me espera em casa\nnem minha equipe segue esse perfil'},
+{t:'senha do Insta (perfil real)',d:'mês passado',b:'é aquele perfil que só uso pra desabafar\nsenha = dia e mês do aniversário de quem me espera em casa: o Prince, meu gato, faz anos em 8 de dezembro\nnem minha equipe segue esse perfil'},
 {t:'Marcelo e as senhas dele',d:'faz tempo',b:'ele sempre usa o ano em que fechou o primeiro contrato grande\nele repete isso em toda entrevista, com muito orgulho\n(2015? 2016? tenho que confirmar)'},
 {t:'quem ganha com isso',d:'hoje',b:'1. Marcelo: cobre um rombo antes que alguém descubra\n2. Patrícia: protege o Marcelo, mas por quê?\n3. quem é esse "Fábio Andrade"?'},
 {t:'plano pro intervalo',d:'hoje, 22:45',b:'vou até o camarim falar com o Gui\nse for verdade, confronto o Marcelo ainda hoje, no palco se precisar\nnão vou deixar o nome da banda ser usado assim'}
@@ -267,7 +302,7 @@ var IGM=[
  ['m','40% do que aparece no contrato não bate com o extrato real do selo.'],
  ['T','Eu suspeitava. Vi o Marcelo mexendo numa "consultoria" estranha semana passada.','Gui'],
  ['m','Vou confrontar ele hoje, com ou sem plateia.'],
- ['T','Cuidado. Troquei minha senha do trabalho pro dia e mês em que vi o primeiro número errado nos contratos. Foi no começo de setembro, faz as contas.','Gui'],
+ ['T','Cuidado. Troquei minha senha do trabalho pro dia e mês em que vi o primeiro número errado nos contratos. Foi em 17 de setembro.','Gui'],
  ['m','Vou anotar isso em algum lugar seguro.'],
  ['t','Bom show. Você é mais forte do que imagina.','Gui']
 ];
@@ -431,6 +466,8 @@ function renderApps(){
   });
 }
 renderApps();
+function void0(){}
+window['void']=void0;
 </script>
 </body>
 </html>
