@@ -110,3 +110,6 @@ body.cine-on #hearts{z-index:31}
 .gallery figure img{min-height:220px;opacity:0;transition:opacity .7s;background:linear-gradient(110deg,#f6d9e2 30%,#fff3f6 50%,#f6d9e2 70%);background-size:200% 100%;animation:shine 1.3s linear infinite}
 .gallery figure img.ok{opacity:1;min-height:0;background:none;animation:none}
 @keyframes shine{to{background-position:-200% 0}}
+.love li.show{opacity:1}
+@keyframes up{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:none}}
+.love li.show.a4{animation:up .9s both}
