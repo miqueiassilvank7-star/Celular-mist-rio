@@ -102,3 +102,6 @@ figure{cursor:zoom-in}
 #cine[hidden]{display:none}@keyframes fade{from{opacity:0}}
 #cine p{font:italic 600 1.7rem/1.5 'Playfair Display',serif;color:#fff;text-shadow:0 0 20px var(--rose)}
 #cine .x{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:18px;font-size:1.5rem;opacity:.6}
+
+body.cine-on #hearts{z-index:31}
+#cine p{max-width:20ch}

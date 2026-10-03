@@ -177,13 +177,21 @@ async function type(el, text, sp = 35) {
   el.classList.remove("cur");
 }
 $("#env").onclick = async function () {
+  if (this.classList.contains("open")) return;
   this.classList.add("open"); burst(15);
   await wait(700);
-  const L = $("#letter"), ps = [...L.querySelectorAll("p")], txt = ps.map(p => p.innerHTML);
-  ps.forEach(p => p.innerHTML = ""); L.hidden = false;
-  for (let i = 0; i < ps.length; i++) {
-    if (txt[i].includes("<br>")) { ps[i].innerHTML = txt[i]; continue; }
-    await type(ps[i], txt[i], 22);
+  const L = $("#letter"), ps = [...L.querySelectorAll("p")];
+  const groups = ps.map(p => {
+    if (p.innerHTML.includes("<br>")) { p.style.opacity = 0; return [p]; }
+    const t = p.textContent;
+    p.innerHTML = [...t].map(c => `<span style="opacity:0">${c}</span>`).join("");
+    return [...p.children];
+  });
+  L.hidden = false;
+  for (const g of groups) {
+    if (g.length === 1 && g[0].tagName === "P") { g[0].style.transition = "opacity 1s"; g[0].style.opacity = 1; await wait(900); continue; }
+    for (const s of g) { s.style.opacity = 1; await wait(22); }
+    await wait(250);
   }
 };
 $("#love").innerHTML = CONFIG.amo.map((t, i) => `<li class="a${i%5}">${i+1}. ${t}</li>`).join("");
@@ -205,17 +213,25 @@ function quiz() {
 }
 quiz();
 $("#unlock").onclick = () => {
-  if ($("#code").value.trim() === CONFIG.codigo) { $("#secret").classList.add("open"); burst(30); }
-  else { $("#code").value = ""; $("#code").placeholder = "tente de novo 💭"; }
+  const v = $("#code").value.replace(/\D/g, "");
+  if (v === CONFIG.codigo) { $("#secret").classList.add("open"); burst(30); setTimeout(() => $("#secret").scrollIntoView({behavior:"smooth", block:"center"}), 300); }
+  else { $("#code").value = ""; $("#code").placeholder = "código errado 💭"; }
 };
-$("#cineX").onclick = () => $("#cine").hidden = true;
+let cineRun = 0;
+function closeCine() { cineRun++; $("#cine").hidden = true; document.body.classList.remove("cine-on"); }
+$("#cineX").onclick = closeCine;
 $("#cineBtn").onclick = async () => {
-  const c = $("#cine"), p = $("#cineTxt"); c.hidden = false;
+  const id = ++cineRun, c = $("#cine"), p = $("#cineTxt"), alive = () => id === cineRun;
+  c.hidden = false; document.body.classList.add("cine-on"); p.style.fontSize = "";
+  await wait(800);
   for (const line of CONFIG.final) {
-    p.textContent = ""; p.style.opacity = 1;
-    await type(p, line, 60); await wait(1400);
-    p.style.transition = "opacity 1s"; p.style.opacity = 0; await wait(1000); p.style.transition = "";
+    if (!alive()) return;
+    p.style.transition = "none"; p.textContent = ""; p.style.opacity = 1;
+    for (const ch of line) { if (!alive()) return; p.textContent += ch; await wait(60); }
+    await wait(1600); if (!alive()) return;
+    p.style.transition = "opacity 1s"; p.style.opacity = 0; await wait(1100);
   }
-  p.style.opacity = 1; p.innerHTML = "❤️<br>Eu te amo, " + CONFIG.nome;
-  p.style.fontSize = "2.2rem"; balloons(40); burst(40);
+  if (!alive()) return;
+  p.style.transition = "opacity 1.5s"; p.innerHTML = "❤️<br>Eu te amo, " + CONFIG.nome; p.style.fontSize = "2.2rem"; p.style.opacity = 1;
+  balloons(40); burst(40);
 };
