@@ -105,3 +105,8 @@ figure{cursor:zoom-in}
 
 body.cine-on #hearts{z-index:31}
 #cine p{max-width:20ch}
+
+/* Fotos: esqueleto rosa enquanto carrega, aparece suavemente */
+.gallery figure img{min-height:220px;opacity:0;transition:opacity .7s;background:linear-gradient(110deg,#f6d9e2 30%,#fff3f6 50%,#f6d9e2 70%);background-size:200% 100%;animation:shine 1.3s linear infinite}
+.gallery figure img.ok{opacity:1;min-height:0;background:none;animation:none}
+@keyframes shine{to{background-position:-200% 0}}

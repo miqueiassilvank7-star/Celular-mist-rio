@@ -1,7 +1,7 @@
 // ====== PERSONALIZE AQUI ======
 const CONFIG = {
   codigo: "1910", // código da mensagem secreta
-  amo: ["Seu sorriso","Seu jeito de me abraçar","Sua risada","Seu cuidado comigo","Sua gentileza","Seu olhar","Como você me faz sentir em casa","Sua força","Seu jeito único","Simplesmente você"],
+  amo: ["Seus olhos","Seu cabelo","Seu sorriso","Seu jeito de ser","As nossas brincadeiras","Seu ciúmes (que eu acho fofo)","Seu carinho","Seu abraço","Como você me faz rir","Simplesmente você"],
   quiz: [
     {q:"Em que mês começamos?",o:["Maio","Junho","Julho"],a:1},
     {q:"Qual é a minha cor favorita?",o:["Azul","Preto","Vermelho"],a:0},
@@ -26,12 +26,15 @@ document.querySelectorAll("img[data-n]").forEach(img => {
     if (i >= EXTS.length) { img.parentElement.remove(); return; }
     img.src = `assets/foto${img.dataset.n}.${EXTS[i++]}`;
   };
+  img.onload = () => img.classList.add("ok");
+  img.decoding = "async";
   img.onerror = next; next();
 });
 
 // Música (assets/musica.mp3)
 const audio = new Audio("assets/musica.mp3");
 audio.loop = true;
+audio.preload = "none"; // não disputa internet com as fotos
 const musicBtn = $("#music");
 let userPaused = false;
 musicBtn.onclick = (e) => {
