@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a0b2e">
+<title>Feliz aniversário 💖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="hearts"></div>
+
+<!-- Tela inicial -->
+<section id="intro">
+  <p class="small">Tem uma surpresa te esperando…</p>
+  <h1 class="name" data-name>Seu Nome</h1>
+  <button id="open" class="btn">Toque para abrir 🌹</button>
+  <p class="small hint">toque em qualquer lugar da tela</p>
+</section>
+
+<main id="site" hidden>
+  <button id="music" class="music" aria-label="Música">🎵</button>
+
+  <!-- Hero -->
+  <header class="hero">
+    <p class="small">Feliz aniversário</p>
+    <h1 class="name glow" data-name>Seu Nome</h1>
+    <p class="lead">Hoje o mundo ganhou mais brilho porque você nasceu. ✨</p>
+    <span class="scroll">role para baixo ↓</span>
+  </header>
+
+  <!-- Contadores -->
+  <section class="block reveal">
+    <h2>O tempo ao seu lado</h2>
+    <div class="count" id="together"></div>
+    <h2>Falta para o próximo aniversário</h2>
+    <div class="count" id="countdown"></div>
+  </section>
+
+  <!-- Galeria -->
+  <section class="block reveal">
+    <h2>Nossos momentos 📸</h2>
+    <div class="gallery">
+      <figure><img data-n="1" alt="Foto 1"><figcaption>Nosso começo</figcaption></figure>
+      <figure><img data-n="2" alt="Foto 2"><figcaption>Meu sorriso favorito</figcaption></figure>
+      <figure><img data-n="3" alt="Foto 3"><figcaption>Para sempre</figcaption></figure>
+      <figure><img data-n="4" alt="Foto 4"><figcaption>Dias de sol</figcaption></figure>
+      <figure><img data-n="5" alt="Foto 5"><figcaption>Só nós dois</figcaption></figure>
+      <figure><img data-n="6" alt="Foto 6"><figcaption>Aventuras juntos</figcaption></figure>
+      <figure><img data-n="7" alt="Foto 7"><figcaption>Meu lugar favorito</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- Carta -->
+  <section class="block reveal">
+    <h2>Uma carta pra você 💌</h2>
+    <article class="letter">
+      <p>Meu amor,</p>
+      <p>Hoje é o seu dia, e eu queria que você soubesse o quanto é especial para mim. Você transforma dias comuns em lembranças que eu quero guardar para sempre.</p>
+      <p>Obrigado(a) por cada risada, por cada abraço e por estar ao meu lado. Que este novo ano da sua vida seja cheio de amor, saúde e sonhos realizados.</p>
+      <p class="sign">Com todo o meu amor,<br>Seu nome ❤️</p>
+    </article>
+  </section>
+
+  <!-- Surpresa -->
+  <section class="block reveal">
+    <h2>Tem mais uma coisa… 🎁</h2>
+    <button id="gift" class="btn">Abrir surpresa</button>
+    <p id="giftMsg" class="gift-msg">🎉 Escreva aqui a sua surpresa: um convite, um presente, uma viagem…</p>
+  </section>
+
+  <!-- Final -->
+  <footer class="block reveal final">
+    <div class="big-heart">❤️</div>
+    <h2>Eu te amo, <span data-name>Seu Nome</span></h2>
+    <p class="lead">Obrigado(a) por existir. Parabéns, meu amor. Hoje e sempre. 💖</p>
+  </footer>
+</main>
+
+<div id="lb" hidden><span class="x">✕</span><img alt=""><p>← deslize para o lado →</p></div>
+<script src="script.js"></script>
+</body>
+</html>
