@@ -3,9 +3,9 @@ const CONFIG = {
   codigo: "1910", // código da mensagem secreta
   amo: ["Seus olhos","Seu cabelo","Seu sorriso","Seu jeito de ser","As nossas brincadeiras","Seu ciúmes (que eu acho fofo)","Seu carinho","Seu abraço","Como você me faz rir","Simplesmente você"],
   quiz: [
-    {q:"Em que mês começamos?",o:["Maio","Junho","Julho"],a:1},
-    {q:"Qual é a minha cor favorita?",o:["Azul","Preto","Vermelho"],a:0},
-    {q:"Quem se declarou primeiro?",o:["Eu","Você","Foi junto"],a:2}
+    {q:"Quem é o mais romântico?",o:["Miqueias","Eloyse","Os dois"],a:0},
+    {q:"Quem é o mais dramático?",o:["Miqueias","Eloyse","Os dois"],a:1},
+    {q:"Quem é o mais engraçado?",o:["Miqueias","Eloyse","Os dois"],a:0}
   ],
   final: ["Eloyse…","Se eu pudesse escolher de novo,","eu escolheria você, todos os dias.","Feliz aniversário, meu amor. ❤️"],
   nome: "Eloyse",
