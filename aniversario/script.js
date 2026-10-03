@@ -1,5 +1,13 @@
 // ====== PERSONALIZE AQUI ======
 const CONFIG = {
+  codigo: "1910", // código da mensagem secreta
+  amo: ["Seu sorriso","Seu jeito de me abraçar","Sua risada","Seu cuidado comigo","Sua gentileza","Seu olhar","Como você me faz sentir em casa","Sua força","Seu jeito único","Simplesmente você"],
+  quiz: [
+    {q:"Em que mês começamos?",o:["Maio","Junho","Julho"],a:1},
+    {q:"Qual é a minha cor favorita?",o:["Azul","Preto","Vermelho"],a:0},
+    {q:"Quem se declarou primeiro?",o:["Eu","Você","Foi junto"],a:2}
+  ],
+  final: ["Eloyse…","Se eu pudesse escolher de novo,","eu escolheria você, todos os dias.","Feliz aniversário, meu amor. ❤️"],
   nome: "Eloyse",
   inicioNamoro: "2026-06-20T00:00:00", // data em que vocês começaram
   proximoAniversario: "2026-10-19T00:00:00", // próxima data de aniversário
@@ -62,10 +70,10 @@ tick(); setInterval(tick, 1000);
 
 // Corações flutuando
 const EMOJIS = ["❤️","💖","💕","🌹","✨","💗"];
-function heart(x) {
+function heart(x, set = EMOJIS) {
   const h = document.createElement("span");
   h.className = "heart";
-  h.textContent = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+  h.textContent = set[Math.floor(Math.random()*set.length)];
   h.style.left = (x ?? Math.random()*100) + "vw";
   h.style.fontSize = 14 + Math.random()*26 + "px";
   h.style.animationDuration = 6 + Math.random()*6 + "s";
@@ -87,7 +95,7 @@ function observe() {
 $("#gift").onclick = () => {
   $("#giftMsg").classList.add("open");
   $("#gift").textContent = "🎉 Surpresa!";
-  burst(40);
+  burst(40); balloons(30);
 };
 
 // Fundo de estrelas
@@ -122,7 +130,7 @@ let lastT = 0;
 function touchHeart(e) {
   if (!opened || e.target.closest("#lb")) return;
   const now = Date.now(); if (now - lastT < 120) return; lastT = now;
-  heart(e.clientX / innerWidth * 100);
+  heart(e.clientX / innerWidth * 100, ["🌸","🌹","🌷","🌼","💮"]);
   const h = $("#hearts").lastChild; h.style.bottom = "auto"; h.style.top = e.clientY + "px";
   h.style.animation = "pop 1.2s ease-out forwards";
 }
@@ -158,3 +166,56 @@ addEventListener("keydown", e => {
   if (e.key === "ArrowRight") show(idx + 1);
   if (e.key === "ArrowLeft") show(idx - 1);
 });
+
+// ===== Novidades =====
+const BAL = ["🎈","🎉","🎊","🎈","🎁"];
+function balloons(n) { for (let i=0;i<n;i++) setTimeout(() => heart(undefined, BAL), i*90); }
+const wait = ms => new Promise(r => setTimeout(r, ms));
+async function type(el, text, sp = 35) {
+  el.classList.add("cur");
+  for (const ch of text) { el.textContent += ch; await wait(sp); }
+  el.classList.remove("cur");
+}
+$("#env").onclick = async function () {
+  this.classList.add("open"); burst(15);
+  await wait(700);
+  const L = $("#letter"), ps = [...L.querySelectorAll("p")], txt = ps.map(p => p.innerHTML);
+  ps.forEach(p => p.innerHTML = ""); L.hidden = false;
+  for (let i = 0; i < ps.length; i++) {
+    if (txt[i].includes("<br>")) { ps[i].innerHTML = txt[i]; continue; }
+    await type(ps[i], txt[i], 22);
+  }
+};
+$("#love").innerHTML = CONFIG.amo.map((t, i) => `<li class="a${i%5}">${i+1}. ${t}</li>`).join("");
+const lio = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { setTimeout(() => e.target.classList.add("show"), 150); lio.unobserve(e.target); }
+}), { threshold: .4 });
+document.querySelectorAll("#love li").forEach(l => lio.observe(l));
+let qi = 0, pts = 0;
+function quiz() {
+  const Q = CONFIG.quiz, box = $("#quiz");
+  if (qi >= Q.length) { box.innerHTML = `<p class="lead">Você acertou ${pts} de ${Q.length}! 💖</p>`; balloons(20); return; }
+  box.innerHTML = `<p class="lead">${Q[qi].q}</p>` + Q[qi].o.map((o, i) => `<button data-i="${i}">${o}</button>`).join("");
+  box.querySelectorAll("button").forEach(b => b.onclick = () => {
+    const ok = +b.dataset.i === Q[qi].a;
+    b.classList.add(ok ? "ok" : "no"); if (ok) { pts++; burst(8); }
+    box.querySelectorAll("button").forEach(x => x.disabled = true);
+    setTimeout(() => { qi++; quiz(); }, 900);
+  });
+}
+quiz();
+$("#unlock").onclick = () => {
+  if ($("#code").value.trim() === CONFIG.codigo) { $("#secret").classList.add("open"); burst(30); }
+  else { $("#code").value = ""; $("#code").placeholder = "tente de novo 💭"; }
+};
+$("#cineX").onclick = () => $("#cine").hidden = true;
+$("#cineBtn").onclick = async () => {
+  const c = $("#cine"), p = $("#cineTxt"); c.hidden = false;
+  for (const line of CONFIG.final) {
+    p.textContent = ""; p.style.opacity = 1;
+    await type(p, line, 60); await wait(1400);
+    p.style.transition = "opacity 1s"; p.style.opacity = 0; await wait(1000); p.style.transition = "";
+  }
+  p.style.opacity = 1; p.innerHTML = "❤️<br>Eu te amo, " + CONFIG.nome;
+  p.style.fontSize = "2.2rem"; balloons(40); burst(40);
+};

@@ -58,12 +58,41 @@
   <!-- Carta -->
   <section class="block reveal">
     <h2>Uma carta pra você 💌</h2>
-    <article class="letter">
+    <div class="env" id="env"><div class="flap"></div><span>💌 toque para abrir</span></div>
+    <article class="letter" id="letter" hidden>
       <p>Meu amor,</p>
       <p>Hoje é o seu dia, e eu queria que você soubesse o quanto é especial para mim. Você transforma dias comuns em lembranças que eu quero guardar para sempre.</p>
       <p>Obrigado(a) por cada risada, por cada abraço e por estar ao meu lado. Que este novo ano da sua vida seja cheio de amor, saúde e sonhos realizados.</p>
       <p class="sign">Com todo o meu amor,<br>Miqueias ❤️</p>
     </article>
+  </section>
+
+  <section class="block reveal">
+    <h2>Nossa história ❤️</h2>
+    <div class="timeline">
+      <div class="ev"><b>20 de junho de 2026</b><p>Começou a nossa história.</p></div>
+      <div class="ev"><b>Primeiro encontro</b><p>Escreva aqui um momento especial.</p></div>
+      <div class="ev"><b>Nossa primeira viagem</b><p>Escreva aqui outra lembrança.</p></div>
+      <div class="ev"><b>Hoje</b><p>E o melhor ainda está por vir.</p></div>
+    </div>
+  </section>
+
+  <section class="block reveal">
+    <h2>10 coisas que amo em você 💭</h2>
+    <ol class="love" id="love"></ol>
+  </section>
+
+  <section class="block reveal">
+    <h2>Quiz sobre nós 🧩</h2>
+    <div id="quiz" class="quiz"></div>
+  </section>
+
+  <section class="block reveal">
+    <h2>Mensagem secreta 🔐</h2>
+    <p class="lead">Digite o código (dica: o dia e o mês do seu aniversário)</p>
+    <input id="code" class="code" inputmode="numeric" maxlength="8" placeholder="• • • •">
+    <button id="unlock" class="btn">Desbloquear</button>
+    <p id="secret" class="gift-msg">💖 Escreva aqui sua mensagem secreta, só para ela.</p>
   </section>
 
   <!-- Surpresa -->
@@ -77,10 +106,12 @@
   <footer class="block reveal final">
     <div class="big-heart">❤️</div>
     <h2>Eu te amo, <span data-name>Eloyse</span></h2>
-    <p class="lead">Obrigado(a) por existir. Parabéns, meu amor. Hoje e sempre. 💖</p>
+    <p class="lead">Obrigado por existir. Parabéns, meu amor. Hoje e sempre. 💖</p>
+    <button id="cineBtn" class="btn">Ver o final 🎬</button>
   </footer>
 </main>
 
+<div id="cine" hidden><span class="x" id="cineX">✕</span><p id="cineTxt"></p></div>
 <div id="lb" hidden><span class="x">✕</span><img alt=""><p>← deslize para o lado →</p></div>
 <script src="script.js"></script>
 </body>
