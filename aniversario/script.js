@@ -1,7 +1,7 @@
 // ====== PERSONALIZE AQUI ======
 const CONFIG = {
   nome: "Seu Nome",
-  inicioNamoro: "2023-02-14T00:00:00", // data em que vocês começaram
+  inicioNamoro: "2026-06-20T00:00:00", // data em que vocês começaram
   proximoAniversario: "2027-03-20T00:00:00", // próxima data de aniversário
 };
 // ==============================
