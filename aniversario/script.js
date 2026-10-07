@@ -1,5 +1,12 @@
 // ====== PERSONALIZE AQUI ======
 const CONFIG = {
+  mensagens: [
+    {t:"Abra quando estiver triste", video:"assets/triste.mp4", m:"Respira fundo, meu amor. Os dias difíceis passam, e eu estou aqui do seu lado. Você é mais forte do que imagina e eu tenho muito orgulho de você. Pode chorar, pode desabafar, eu fico com você. 💖"},
+    {t:"Abra quando sentir saudade", m:"Oi, meu amor… se você está vendo isso, é porque bateu saudade.\n\nAqui também bate. Às vezes eu paro e fico lembrando de você… do nosso primeiro encontro, do nosso primeiro beijo na praça, das nossas brincadeiras.\n\nEu quero te falar que eu te amo muito, muito mesmo.\n\nAgora fecha os olhos… e imagina eu te abraçando bem forte. Tá sentindo? Eu tô aí com você. 💖"},
+    {t:"Abra quando quiser sorrir", m:"Oii, meu amor! Se você veio aqui é porque precisa de um sorriso, então vamos lá…\n\nPrimeiro motivo: você tem eu ao seu lado, claro, alguém muito engraçado.\n\nSegundo motivo: você é a pessoa mais dramática que eu conheço kkkk\n\nTerceiro motivo: lembra do nosso primeiro beijo lá na praça? Eu lembro até hoje e sorrio sozinho kkkk\n\nAgora dá um sorrisinho aí pra mim, acho que eu mereço kkk"},
+    {t:"Abra quando duvidar do quanto eu te amo", video:"assets/duvidar.mp4", m:"Se um dia você duvidar, lembra: eu escolhi você, e continuo escolhendo todos os dias. Eu te amo mais do que consigo dizer. ❤️"},
+    {t:"Abra no seu próximo aniversário", soon:true, video:"assets/aniversario.mp4", lock:"2027-10-19T00:00:00", m:"Mais um ano da sua vida, e eu continuo aqui, ainda mais apaixonado. Obrigado por cada momento deste ano. Feliz aniversário, meu amor! 🎂"}
+  ],
   codigo: "1910", // código da mensagem secreta
   amo: ["Seus olhos","Seu cabelo","Seu sorriso","Seu jeito de ser","As nossas brincadeiras","Seu ciúmes (que eu acho fofo)","Seu carinho","Seu abraço","Como você me faz rir","Simplesmente você"],
   quiz: [
@@ -238,3 +245,66 @@ $("#cineBtn").onclick = async () => {
   p.style.transition = "opacity 1.5s"; p.innerHTML = "❤️<br>Eu te amo, " + CONFIG.nome; p.style.fontSize = "2.2rem"; p.style.opacity = 1;
   balloons(40); burst(40);
 };
+
+// Caixa de mensagens
+$("#mails").innerHTML = CONFIG.mensagens.map((x, i) => `<button class="mail${x.soon || x.lock ? " lock" : ""}" data-i="${i}">${x.t}</button>`).join("");
+document.querySelectorAll(".mail").forEach(b => b.onclick = () => {
+  const x = CONFIG.mensagens[b.dataset.i];
+  const locked = x.soon || (x.lock && new Date() < new Date(x.lock));
+  $("#mt").textContent = x.t;
+  $("#mbox").classList.toggle("voice", !!(x.audio && !locked));
+  document.body.classList.toggle("cine-on", !!(x.audio && !locked));
+  if (x.audio && !locked) { $("#mv").innerHTML = voiceHTML(x.audio); setupVoice(); } else
+  $("#mv").innerHTML = x.video && !locked ? `<video src="${x.video}" controls playsinline preload="metadata" onerror="this.remove()"></video>` : "";
+  $("#mm").textContent = x.soon ? "🔒 Agora não, amor, espere! Essa ainda está sendo preparada com muito carinho. Logo ela abre. 💕" : locked ? "🔒 Essa só abre no seu próximo aniversário. Ainda não, amor! Volte nessa data e eu vou estar aqui. 💕" : x.m;
+  $("#mbox").hidden = false; if (!locked) burst(12);
+});
+function closeMsg() {
+  if (window._vs) window._vs();
+  $("#mbox").hidden = true; $("#mv").innerHTML = ""; $("#mbox").classList.remove("voice"); document.body.classList.remove("cine-on");
+  if (!userPaused && audio.paused) audio.play().catch(()=>{});
+}
+$("#mx").onclick = closeMsg;
+$("#mbox").addEventListener("click", e => { if (e.target.id === "mbox") closeMsg(); });
+// Pausa a música enquanto o vídeo toca
+$("#mbox").addEventListener("play", e => { if (e.target.tagName === "VIDEO" || e.target.tagName === "AUDIO") audio.pause(); }, true);
+
+// Player de voz bonito (áudio gravado por você)
+const AEXT = ["mp3","m4a","ogg","opus","wav","aac","webm"];
+function voiceHTML(base) {
+  return `<div class="voice"><div class="orb" id="orb"><i></i><i></i><button id="pbtn" aria-label="Tocar">▶</button></div>
+  <div class="bars" id="bars">${"<b></b>".repeat(26)}</div>
+  <div class="prog" id="prog"><div id="pfill"></div></div><small id="ptime">toque para ouvir 💌</small>
+  <audio id="vaud" preload="metadata">${AEXT.map(e => `<source src="${base}.${e}">`).join("")}</audio></div>`;
+}
+function setupVoice() {
+  const a = $("#vaud"), btn = $("#pbtn"), orb = $("#orb"), bars = [...document.querySelectorAll("#bars b")];
+  const fmt = s => Math.floor(s/60) + ":" + pad(Math.floor(s%60));
+  a.querySelector("source:last-child").addEventListener("error", () => { const v = document.querySelector(".voice"); if (v) v.remove(); });
+  let ctx, an, data, raf, hb;
+  const loop = () => {
+    if (an) { an.getByteFrequencyData(data); bars.forEach((b, i) => b.style.transform = `scaleY(${.12 + data[i*2] / 255 * 1.2})`); }
+    else bars.forEach(b => b.style.transform = `scaleY(${.2 + Math.random()})`);
+    raf = requestAnimationFrame(loop);
+  };
+  const stop = () => { cancelAnimationFrame(raf); clearInterval(hb); orb.classList.remove("on"); btn.textContent = "▶"; bars.forEach(b => b.style.transform = ""); };
+  window._vs = () => { stop(); a.pause(); };
+  btn.onclick = () => {
+    if (!a.paused) { a.pause(); return; }
+    audio.pause();
+    if (location.protocol.startsWith("http") && !an) {
+      try {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const s = ctx.createMediaElementSource(a); an = ctx.createAnalyser(); an.fftSize = 128;
+        data = new Uint8Array(an.frequencyBinCount); s.connect(an); an.connect(ctx.destination);
+      } catch (e) { an = null; }
+    }
+    if (ctx) ctx.resume();
+    a.play();
+  };
+  a.addEventListener("play", () => { orb.classList.add("on"); btn.textContent = "❚❚"; loop(); hb = setInterval(heart, 450); });
+  a.addEventListener("pause", stop);
+  a.addEventListener("ended", () => { stop(); btn.textContent = "↻"; burst(20); });
+  a.addEventListener("timeupdate", () => { if (!$("#pfill")) return; $("#pfill").style.width = (a.currentTime / a.duration * 100 || 0) + "%"; $("#ptime").textContent = fmt(a.currentTime) + " / " + fmt(a.duration || 0); });
+  $("#prog").onclick = e => { const r = e.currentTarget.getBoundingClientRect(); if (a.duration) a.currentTime = (e.clientX - r.left) / r.width * a.duration; };
+}
