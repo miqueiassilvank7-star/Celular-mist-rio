@@ -17,7 +17,7 @@ const CONFIG = {
   final: ["Eloyse…","Se eu pudesse escolher de novo,","eu escolheria você, todos os dias.","Feliz aniversário, meu amor. ❤️"],
   nome: "Eloyse",
   inicioNamoro: "2026-06-20T00:00:00", // data em que vocês começaram
-  proximoAniversario: "2026-10-18T00:00:00", // próxima data de aniversário
+  proximoAniversario: "2026-10-19T00:00:00", // próxima data de aniversário
 };
 // ==============================
 
